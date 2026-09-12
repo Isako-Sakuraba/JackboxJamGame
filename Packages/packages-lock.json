@@ -236,13 +236,13 @@
       "url": "https://packages.unity.com"
     },
     "dev.purrnet.purrdiction": {
-      "version": "https://github.com/PurrNet/PurrDiction.git?path=/Assets/PurrDiction#release",
+      "version": "https://github.com/PurrNet/PurrDiction.git?path=/Assets/PurrDiction#dev",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.11.4"
       },
-      "hash": "b29194a87fb4a57be0156069f8d3ef40d0040a56"
+      "hash": "1787465ace7904bc2ab421c7c80a2f697e7bc8da"
     },
     "dev.purrnet.purrlobby": {
       "version": "file:dev.purrnet.purrlobby",
