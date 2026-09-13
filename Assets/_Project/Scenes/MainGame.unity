@@ -758,7 +758,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.StatisticsManager
   checkInterval: 0.33
   placement: 1
-  _displayType: 3
+  _displayType: 19
   _displayTarget: 6
   fontSize: 24
   textColor: {r: 0, g: 0, b: 0, a: 1}
@@ -4557,7 +4557,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6492247728207080574, guid: 49f5e0e1e386aae4c899230538530f63, type: 3}
       propertyPath: _tickRate
-      value: 40
+      value: 64
       objectReference: {fileID: 0}
     - target: {fileID: 6492247728207080574, guid: 49f5e0e1e386aae4c899230538530f63, type: 3}
       propertyPath: _networkRules

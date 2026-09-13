@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: GameAllocator.Jam
   m_EditorClassIdentifier: PurrNet.Lobby.GenericProviders::PurrNet.Lobby.GenericProviders.P2PGameStarter
   _gameScene: MainGame
+  _useP2P: 0

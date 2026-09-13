@@ -251,7 +251,6 @@ GameObject:
   - component: {fileID: 1244956412210444065}
   - component: {fileID: 5008526362820003612}
   - component: {fileID: 182012864943874995}
-  - component: {fileID: 1416941329088662628}
   - component: {fileID: 6551424020485106173}
   m_Layer: 7
   m_Name: Player
@@ -305,49 +304,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: PurrNet.Prediction::PurrNet.Prediction.StaticPredictedIdentity
   _predictionPolicySource: 0
   _predictionPolicy: 0
---- !u!114 &1416941329088662628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3117929452709367691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40d84b22587be5646afa613d6e4fd071, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerController
-  _predictionPolicySource: 0
-  _predictionPolicy: 0
-  _repeatInputFactor: 0
-  _extrapolateInput: 0
-  _motor: {fileID: 3711912542184154043}
-  _debug: 1
-  _groundSpeed: 6
-  _groundAcceleration: 64
-  _groundFriction: 12
-  _stopSpeed: 0.02
-  _airSpeed: 6
-  _airAcceleration: 12
-  _maxFallSpeed: -12
-  _jumpHeight: 3.6
-  _gravity: -22
-  _jumpBuffer: 0.16
-  _coyoteTime: 0.12
-  _wallJumpHeight: 2
-  _wallJumpNormalForce: 6
-  _wallJumpAccelerationMultiplier: 0.4
-  _wallJumpAccelerationTimer: 0.8
-  _wallSlideGravityMultiplier: 1.2
-  _wallSlideSpeed: -3.4
-  _wallStickForce: 0.2
-  _wallStickTimer: 0.4
-  _wallDetectionMask:
-    serializedVersion: 2
-    m_Bits: 1
-  _wallProbeDistance: 0.026
-  _wallRayCount: 3
-  _wallRayVerticalPadding: 0.25
 --- !u!114 &6551424020485106173
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -465,9 +421,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6117148581298859934}
+  - component: {fileID: 8603205996886712555}
   - component: {fileID: 2433791428283974601}
   - component: {fileID: 3711912542184154043}
-  - component: {fileID: 8603205996886712555}
+  - component: {fileID: 8763001070014174889}
   m_Layer: 7
   m_Name: PhysicalBody
   m_TagString: Untagged
@@ -490,6 +447,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1244956412210444065}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8603205996886712555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519324735334471084}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 98dbb08343eac044895b9b52872bcb49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.Prediction::PurrNet.Prediction.PredictedTransform
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
+  _graphics: {fileID: 410936394365746716}
+  _floatAccuracy: 0
+  _interpolationSettings: {fileID: 11400000, guid: 4a8aa8e44e23cfd4a8d4387ef3f36173, type: 2}
+  _unparentGraphics: 0
+  _characterControllerPatch: 0
+  _softCorrection:
+    correctionRate: 8
+    snapPositionThreshold: 3
+    snapRotationThreshold: 75
 --- !u!70 &2433791428283974601
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -545,10 +525,10 @@ MonoBehaviour:
   _skinWidth: 0.02
   _maxSlideIterations: 5
   _maxSlopeAngle: 50
-  _groundSnapDistance: 1
   _groundProbeDistance: 0.05
+  _groundSnapDistance: 1
   _minMoveDistance: 0.0001
---- !u!114 &8603205996886712555
+--- !u!114 &8763001070014174889
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -557,20 +537,40 @@ MonoBehaviour:
   m_GameObject: {fileID: 8519324735334471084}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 98dbb08343eac044895b9b52872bcb49, type: 3}
+  m_Script: {fileID: 11500000, guid: 40d84b22587be5646afa613d6e4fd071, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PurrNet.Prediction::PurrNet.Prediction.PredictedTransform
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerController
   _predictionPolicySource: 0
   _predictionPolicy: 0
-  _graphics: {fileID: 410936394365746716}
-  _floatAccuracy: 0
-  _interpolationSettings: {fileID: 11400000, guid: 4a8aa8e44e23cfd4a8d4387ef3f36173, type: 2}
-  _unparentGraphics: 0
-  _characterControllerPatch: 0
-  _softCorrection:
-    correctionRate: 8
-    snapPositionThreshold: 3
-    snapRotationThreshold: 75
+  _repeatInputFactor: 0.4
+  _extrapolateInput: 1
+  _motor: {fileID: 3711912542184154043}
+  _debug: 1
+  _groundSpeed: 6
+  _groundAcceleration: 64
+  _groundFriction: 12
+  _stopSpeed: 0.02
+  _airSpeed: 6
+  _airAcceleration: 12
+  _maxFallSpeed: -12
+  _jumpHeight: 3.6
+  _gravity: -22
+  _jumpBuffer: 0.16
+  _coyoteTime: 0.12
+  _wallJumpHeight: 2
+  _wallJumpNormalForce: 6
+  _wallJumpAccelerationMultiplier: 0.4
+  _wallJumpAccelerationTimer: 0.8
+  _wallSlideGravityMultiplier: 1.2
+  _wallSlideSpeed: -3.4
+  _wallStickForce: 0.2
+  _wallStickTimer: 0.4
+  _wallDetectionMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _wallProbeDistance: 0.026
+  _wallRayCount: 3
+  _wallRayVerticalPadding: 0.25
 --- !u!1 &8929181978747050801
 GameObject:
   m_ObjectHideFlags: 0
@@ -765,5 +765,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 144e29b7dcd4429aa116231a12e08fe8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.Debugging.PlayerControllerDebug
-  _controller: {fileID: 1416941329088662628}
+  _controller: {fileID: 0}
   _text: {fileID: 5782199388159820392}
