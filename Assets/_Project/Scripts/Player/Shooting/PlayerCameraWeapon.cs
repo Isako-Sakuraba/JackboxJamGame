@@ -3,6 +3,7 @@ using Game.Services;
 using PurrNet.Prediction;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.Serialization;
 
 namespace Game.Player
 {
@@ -41,16 +42,17 @@ namespace Game.Player
         }
         #endregion
 
-        [Header("Stutter Settings")]
+        [Header("Shutter Settings")]
         [SerializeField] private float _focusTime = 1.2f;
         [SerializeField] private float _overfocusResistanceTime = 1f;
         [SerializeField] private float _overfocusDirectionPenaltyMultiplier = 0.2f;
-        [SerializeField] private Vector2 _focusAngle = new Vector2(120f, 45f);
+        [FormerlySerializedAs("_focusAngle")]
+        [SerializeField] private Vector2 _focusSpotAngle = new Vector2(120f, 45f);
         [SerializeField] private Vector2 _focusRadius = new Vector2(2f, 6f);
-        [SerializeField] private Transform _stutterOrigin;
+        [SerializeField] private Transform _shutterOrigin;
 
-        [Header("Stutter Visuals")]
-        [SerializeField] private Light2D _stutterLight;
+        [Header("Shutter Visuals")]
+        [SerializeField] private Light2D _shutterLight;
         [SerializeField] private float _radiusMultiplier = 0.95f;
         [SerializeField] private float _spotAngleMultiplier = 0.95f;
 
@@ -62,6 +64,12 @@ namespace Game.Player
         public PredictedEvent CameraFocused;
         public PredictedEvent CameraOverfocused;
         public PredictedEvent CameraShot;
+
+        public float FocusTime => _focusTime;
+        public Vector2 FocusSpotAngle => _focusSpotAngle;
+        public Vector2 FocusRadius => _focusRadius;
+        public float RadiusMultiplier => _radiusMultiplier;
+        public float SpotAngleMultiplier => _spotAngleMultiplier;
 
         public override void OnPreSetup()
         {
@@ -105,7 +113,7 @@ namespace Game.Player
                     screenPosition.y, 
                     -_camera.transform.position.z));
 
-            Vector2 origin = _stutterOrigin.position;
+            Vector2 origin = _shutterOrigin.position;
             Vector2 direction = (worldPosition - origin).normalized;
 
             input.ShootDirection = direction;
@@ -153,8 +161,8 @@ namespace Game.Player
                 float max = _focusTime;
                 float t = current / max; // t is 1 means just started focus, t is 0 means finished
                 t = Mathf.Clamp01(1 - t);
-                float radius = Mathf.Lerp(_focusAngle.x, _focusAngle.y, t);
-                float distance = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
+                float spotAngle = Mathf.Lerp(_focusSpotAngle.x, _focusSpotAngle.y, t);
+                float radius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
 
                 state.IsFocusing = false;
                 state.FocusTimer = _focusTime;
@@ -175,29 +183,5 @@ namespace Game.Player
             return state;
         }
 
-        protected override void UpdateView(WeaponState viewState, WeaponState? verified)
-        {
-            if (!viewState.IsFocusing)
-                return;
-
-            float current = viewState.FocusTimer;
-            float max = _focusTime;
-            float t = current / max; // t is 1 means just started focus, t is 0 means finished
-            t = Mathf.Clamp01(1 - t);
-            float outerRadius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
-            float outerAngle = Mathf.Lerp(_focusAngle.x, _focusAngle.y, t);
-            float innerRadius = _radiusMultiplier * outerRadius;
-            float innerAngle = _spotAngleMultiplier * outerAngle;
-            Vector2 direction = viewState.Direction;
-
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-
-            _stutterLight.transform.rotation = Quaternion.Euler(0f, 0f, angle);
-
-            _stutterLight.pointLightInnerAngle = innerAngle;
-            _stutterLight.pointLightOuterAngle = outerAngle;
-            _stutterLight.pointLightInnerRadius = innerRadius;
-            _stutterLight.pointLightOuterRadius = outerRadius;
-        }
     }
 }

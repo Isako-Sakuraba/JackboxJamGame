@@ -357,13 +357,13 @@ MonoBehaviour:
   _repeatInputFactor: 0.8
   _extrapolateInput: 1
   _focusTime: 0.4
-  _overfocusResistanceTime: 1
-  _overfocusDirectionPenaltyMultiplier: 1.6
-  _focusAngle: {x: 120, y: 28}
+  _overfocusResistanceTime: 1.2
+  _overfocusDirectionPenaltyMultiplier: 1.2
+  _focusSpotAngle: {x: 120, y: 28}
   _focusRadius: {x: 0.25, y: 6}
-  _stutterOrigin: {fileID: 766558300064734478}
-  _stutterLight: {fileID: 8149616131569366179}
-  _radiusMultiplier: 0.96
+  _shutterOrigin: {fileID: 766558300064734478}
+  _shutterLight: {fileID: 8149616131569366179}
+  _radiusMultiplier: 0.1
   _spotAngleMultiplier: 0.92
 --- !u!114 &3906506012229792830
 MonoBehaviour:
@@ -378,13 +378,40 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerCameraWeaponView
   _weapon: {fileID: 8412999158598712483}
-  _stutterLight: {fileID: 8149616131569366179}
+  _shutterLight: {fileID: 8149616131569366179}
   _audioSource: {fileID: 6898178408069097735}
-  _stutterReleaseTime: 0.05
+  _focusStartedLightSettings:
+    color: {r: 1, g: 1, b: 1, a: 1}
+    Intensity: 2
+    transitionIntensity: 2
+    transitionTime: 0.1
+    buildupCoefficient: 0.1
+    stayCoefficient: 0.1
+  _focusedLightSettings:
+    color: {r: 1, g: 1, b: 1, a: 1}
+    Intensity: 14
+    transitionIntensity: 28
+    transitionTime: 0.32
+    buildupCoefficient: 0.2
+    stayCoefficient: 0.1
+  _overfocusedLightSettings:
+    color: {r: 1, g: 0.3226415, b: 0.3226415, a: 1}
+    Intensity: 8
+    transitionIntensity: 8
+    transitionTime: 1
+    buildupCoefficient: 0.2
+    stayCoefficient: 0.1
+  _shootLightSettings:
+    color: {r: 1, g: 1, b: 1, a: 1}
+    Intensity: 2
+    transitionIntensity: 36
+    transitionTime: 0.08
+    buildupCoefficient: 0.08
+    stayCoefficient: 0.05
   _focusStartClip: {fileID: 8300000, guid: a0bf602858da66e40a47d695d573d234, type: 3}
-  _focusedClip: {fileID: 8300000, guid: 17f2c08dffa8c1c47a66b8fdf0db5bba, type: 3}
-  _overfocusedClip: {fileID: 0}
-  _shotClip: {fileID: 8300000, guid: 612a7fef12fd21f4d937f535f1197361, type: 3}
+  _focusedClip: {fileID: 8300000, guid: 766f819dc963c7d47a2f440828e302c4, type: 3}
+  _overfocusedClip: {fileID: 8300000, guid: 1052dc98e815c2a4cb40957ea832d1fb, type: 3}
+  _shotClip: {fileID: 8300000, guid: 99d0957d803a3da4382e2bbf24c33235, type: 3}
 --- !u!1 &4947902395173371710
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,7 +423,7 @@ GameObject:
   - component: {fileID: 766558300064734478}
   - component: {fileID: 8149616131569366179}
   m_Layer: 0
-  m_Name: Stutter
+  m_Name: ShutterLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -438,7 +465,7 @@ MonoBehaviour:
     rid: 9055094287583674446
   m_FalloffIntensity: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 8.24
+  m_Intensity: 8
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000i
@@ -996,7 +1023,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 612a7fef12fd21f4d937f535f1197361, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.4
   m_Pitch: 1
   Loop: 0
   Mute: 0
