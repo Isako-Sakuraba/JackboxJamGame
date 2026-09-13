@@ -111,33 +111,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerController
   _predictionPolicySource: 0
   _predictionPolicy: 0
-  _repeatInputFactor: 0.8
+  _repeatInputFactor: 0
   _extrapolateInput: 0
   _motor: {fileID: 3711912542184154043}
   _debug: 1
   _groundSpeed: 6
-  _groundAcceleration: 60
-  _groundDeceleration: 80
-  _groundTurnAcceleration: 120
+  _groundAcceleration: 64
+  _groundFriction: 12
+  _stopSpeed: 0.02
   _airSpeed: 6
-  _airAcceleration: 30
-  _airDeceleration: 10
-  _airTurnAcceleration: 50
+  _airAcceleration: 12
   _maxFallSpeed: -12
   _jumpHeight: 3.6
-  _gravity: -18
-  _jumpBuffer: 0.2
-  _coyoteTime: 0.2
-  _apexThreshold: 0.6
-  _wallJumpHeight: 1
+  _gravity: -22
+  _jumpBuffer: 0.16
+  _coyoteTime: 0.12
+  _wallJumpHeight: 2
   _wallJumpNormalForce: 6
-  _wallSlideGravityMultiplier: 0.35
-  _wallSlideSpeed: -4
+  _wallJumpAccelerationMultiplier: 0.4
+  _wallJumpAccelerationTimer: 0.8
+  _wallSlideGravityMultiplier: 1.2
+  _wallSlideSpeed: -3.4
   _wallStickForce: 0.2
+  _wallStickTimer: 0.4
   _wallDetectionMask:
     serializedVersion: 2
     m_Bits: 1
-  _wallProbeDistance: 0.05
+  _wallProbeDistance: 0.026
   _wallRayCount: 3
   _wallRayVerticalPadding: 0.25
 --- !u!1 &5712525201905460533

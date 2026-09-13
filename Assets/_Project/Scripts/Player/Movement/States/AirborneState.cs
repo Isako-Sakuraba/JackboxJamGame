@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace Game.Player.Movement.States
 {
     public class AirborneState : LocomotionStateBase
@@ -12,6 +14,7 @@ namespace Game.Player.Movement.States
         {
             if (state.IsGrounded)
             {
+                state.WallJumpTimer = 0f;
                 state.MovementState = MovementState.Grounded;
                 return;
             }
@@ -28,8 +31,17 @@ namespace Game.Player.Movement.States
 
         public override void Tick(in PlayerController.PlayerInput input, ref PlayerController.PlayerState state, float delta)
         {
+            float multiplier = 1f;
+
+            if (state.WallJumpTimerTicking
+                && Mathf.Sign(input.Move.x) != Mathf.Sign(state.Velocity.x))
+            {
+                float t = Mathf.Clamp01(state.WallJumpTimer / Context.WallJumpAccelerationTimer);
+                multiplier = Mathf.Lerp(1f, Context.WallJumpAccelerationMultiplier, t);
+            }
+
             Context.ApplyGravity(input.JumpHeld, ref state, delta, 1f, Context.MaxFallSpeed);
-            Context.ApplyAirMovement(input.Move.x, ref state, delta);
+            Context.ApplyAirMovement(input.Move.x, ref state, delta, multiplier);
             Context.ApplyJumpCut(input.JumpReleased, ref state);
         }
     }

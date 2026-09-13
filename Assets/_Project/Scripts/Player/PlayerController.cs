@@ -3,6 +3,7 @@ using Game.Core;
 using Game.Player.Movement;
 using Game.Services;
 using Game.Utilities;
+using PurrNet.Lobby;
 using PurrNet.Prediction;
 using UnityEngine;
 
@@ -38,6 +39,8 @@ namespace Game.Player
 
             public float CoyoteTimer;
             public float JumpBufferTimer;
+            public float WallJumpTimer;
+            public float WallStickTimer;
 
             public bool WasGrounded;
             public bool IsGrounded;
@@ -48,16 +51,20 @@ namespace Game.Player
             public Vector2 LeftWallNormal;
             public Vector2 RightWallNormal;
 
-            public bool JumpedThisTick;
+            public bool Jumped;
             public MovementState MovementState;
 
             public bool CoyoteJumpAvailable => CoyoteTimer > 0f;
             public bool BufferedJumpAvailable => JumpBufferTimer > 0f;
+            public bool WallJumpTimerTicking => WallJumpTimer > 0f;
+            public bool WallStickTimerAvailable => WallStickTimer > 0f;
 
             public void TickTimers(float delta)
             {
                 CoyoteTimer = Mathf.Max(0f, CoyoteTimer - delta);
                 JumpBufferTimer = Mathf.Max(0f, JumpBufferTimer - delta);
+                WallJumpTimer = Mathf.Max(0f, WallJumpTimer - delta);
+                WallStickTimer = Mathf.Max(0f, WallStickTimer - delta);
             }
 
             public void Dispose() { }
@@ -75,7 +82,7 @@ namespace Game.Player
                     $"IsCollidingRight: {IsCollidingRight}\n" +
                     $"LeftWallNormal: {LeftWallNormal}\n" +
                     $"RightWallNormal: {RightWallNormal}\n" +
-                    $"JumpedThisTick: {JumpedThisTick}\n" +
+                    $"Jumped: {Jumped}\n" +
                     $"MovementState: {MovementState}";
             }
         }
@@ -91,14 +98,12 @@ namespace Game.Player
         [Header("Ground Settings")]
         [SerializeField] private float _groundSpeed = 6f;
         [SerializeField] private float _groundAcceleration = 40f;
-        [SerializeField] private float _groundDeceleration = 70f;
-        [SerializeField] private float _groundTurnAcceleration = 120f;
+        [SerializeField] private float _groundFriction = 8f;
+        [SerializeField] private float _stopSpeed = 8f;
 
         [Header("Air Settings")]
         [SerializeField] private float _airSpeed = 4f;
         [SerializeField] private float _airAcceleration = 40f;
-        [SerializeField] private float _airDeceleration = 70f;
-        [SerializeField] private float _airTurnAcceleration = 120f;
         [SerializeField] private float _maxFallSpeed = -10f;
 
         [Header("Jump Settings")]
@@ -106,16 +111,18 @@ namespace Game.Player
         [SerializeField] private float _gravity = -18f;
         [SerializeField] private float _jumpBuffer = 0.2f;
         [SerializeField] private float _coyoteTime = 0.2f;
-        [SerializeField] private float _apexThreshold = 4f;
 
         [Header("Wall Jump Settings")]
         [SerializeField] private float _wallJumpHeight = 2f;
         [SerializeField] private float _wallJumpNormalForce = 1f;
+        [SerializeField] private float _wallJumpAccelerationMultiplier = 0.4f;
+        [SerializeField] private float _wallJumpAccelerationTimer = 0.8f;
 
         [Header("Wall Slide Settings")]
         [SerializeField] private float _wallSlideGravityMultiplier = 0.35f;
         [SerializeField] private float _wallSlideSpeed = 4f;
         [SerializeField] private float _wallStickForce = 2f;
+        [SerializeField] private float _wallStickTimer = 0.6f;
 
         [Header("Wall Detection")]
         [SerializeField] private LayerMask _wallDetectionMask = ~0;
@@ -136,6 +143,9 @@ namespace Game.Player
         public float WallSlideGravityMultiplier => _wallSlideGravityMultiplier;
         public float WallStickForce => _wallStickForce;
         public float WallSlideSpeed => _wallSlideSpeed;
+        public float WallJumpAccelerationTimer => _wallJumpAccelerationTimer;
+        public float WallJumpAccelerationMultiplier => _wallJumpAccelerationMultiplier;
+        public float WallStickTimer => _wallStickTimer;
 
         private void Awake()
         {
@@ -199,7 +209,9 @@ namespace Game.Player
 
             state.TickTimers(delta);
             state.WasGrounded = state.IsGrounded;
-            state.JumpedThisTick = false;
+
+            if (state.IsGrounded)
+                state.Jumped = false;
 
             if (input.JumpPressed)
                 state.JumpBufferTimer = _jumpBuffer;
@@ -222,7 +234,7 @@ namespace Game.Player
             bool wasGrounded = state.IsGrounded;
             SyncCollisionState(ref state);
 
-            if (!state.JumpedThisTick && wasGrounded && !state.IsGrounded)
+            if (!state.Jumped && wasGrounded && !state.IsGrounded)
                 state.CoyoteTimer = _coyoteTime;
 
             if (state.IsGrounded)
@@ -233,7 +245,7 @@ namespace Game.Player
         {
             state.JumpBufferTimer = 0f;
             state.CoyoteTimer = 0f;
-            state.JumpedThisTick = true;
+            state.Jumped = true;
             state.Velocity.y = Utils.GetJumpVelocity(_jumpHeight, AbsoluteGravity);
             _motor.DisableGroundSnapping();
         }
@@ -242,7 +254,8 @@ namespace Game.Player
         {
             state.JumpBufferTimer = 0f;
             state.CoyoteTimer = 0f;
-            state.JumpedThisTick = true;
+            state.WallStickTimer = 0f;
+            state.Jumped = true;
             state.IsWallSliding = false;
             state.Velocity = wallNormal * _wallJumpNormalForce;
             state.Velocity.y = Utils.GetJumpVelocity(_wallJumpHeight, AbsoluteGravity);
@@ -256,56 +269,60 @@ namespace Game.Player
             float multiplier,
             float maxFallSpeed)
         {
-            float apexMultiplier = jumpHeld && Mathf.Abs(state.Velocity.y) < _apexThreshold ? 0.5f : 1f;
-            float gravityMultiplier = apexMultiplier * multiplier;
-            state.Velocity.y = Mathf.MoveTowards(
-                state.Velocity.y,
-                maxFallSpeed,
-                AbsoluteGravity * gravityMultiplier * delta);
+            state.Velocity.y += _gravity * multiplier * delta;
+            state.Velocity.y = Mathf.Max(state.Velocity.y, maxFallSpeed);
         }
 
         public void ApplyJumpCut(bool jumpReleased, ref PlayerState state)
         {
-            if (!state.IsGrounded && jumpReleased && state.Velocity.y > 0f)
+            if (!state.IsGrounded && jumpReleased && state.Velocity.y > 0f && state.Jumped)
+            {
                 state.Velocity.y *= 0.5f;
+                state.Jumped = false;
+            }
         }
 
         public void ApplyGroundMovement(float moveInput, ref PlayerState state, float delta)
         {
-            float targetSpeed = moveInput * _groundSpeed;
-            Vector2 tangent = new Vector2(_motor.GroundNormal.y, -_motor.GroundNormal.x);
-
-            if (tangent.x < 0f)
-                tangent = -tangent;
-
-            float speed = Vector2.Dot(state.Velocity, tangent);
-            float accel = Utils.GetAcceleration(
-                moveInput,
-                speed,
-                _groundAcceleration,
-                _groundDeceleration,
-                _groundTurnAcceleration);
-
-            speed = Mathf.MoveTowards(speed, targetSpeed, accel * delta);
-            state.Velocity = tangent * speed;
+            ApplyFriction(ref state.Velocity, _groundFriction, _stopSpeed, delta);
+            ApplyHorizontalMovement(ref state.Velocity, moveInput, _groundSpeed, _groundAcceleration, delta);
         }
 
-        public void ApplyAirMovement(float moveInput, ref PlayerState state, float delta)
+        public void ApplyAirMovement(float moveInput, ref PlayerState state, float delta, float accelerationMultiplier)
         {
-            float targetSpeed = moveInput * _airSpeed;
-            float accel = Utils.GetAcceleration(
-                moveInput,
-                state.Velocity.x,
-                _airAcceleration,
-                _airDeceleration,
-                _airTurnAcceleration);
+            ApplyHorizontalMovement(ref state.Velocity, moveInput, _airSpeed, accelerationMultiplier * _airAcceleration, delta);
+        }
 
-            state.Velocity.x = Mathf.MoveTowards(state.Velocity.x, targetSpeed, accel * delta);
+        public static void ApplyHorizontalMovement(
+            ref Vector2 velocity,
+            float input,
+            float maxSpeed,
+            float acceleration,
+            float delta)
+        {
+            if (Mathf.Abs(input) < 0.001f)
+                return;
+
+            var wishDir = new Vector2(input, 0f);
+
+            Accelerate(ref velocity, wishDir, maxSpeed, acceleration, delta);
         }
 
         public bool CanWallSlide(float moveInput, in PlayerState state)
         {
             if (state.IsGrounded)
+                return false;
+
+            float velocitySign = Mathf.Sign(state.Velocity.x);
+            float inputSign = Mathf.Sign(moveInput);
+            float velocityValue = Mathf.Abs(state.Velocity.x) > 0.2f ? 1f : 0f;
+            float inputValue = Mathf.Abs(moveInput) > 0.2f ? 1f : 0f;
+
+            float velocityPriority = velocitySign * velocityValue;
+            float inputPriority = inputSign * inputValue;
+
+            // If moving vertically near a wall and there is no input
+            if (velocityPriority == 0f && inputPriority == 0f)
                 return false;
 
             if (!TryGetWallNormal(in state, out Vector2 wallNormal))
@@ -411,6 +428,48 @@ namespace Game.Player
             _wallFilter = new ContactFilter2D();
             _wallFilter.SetLayerMask(_wallDetectionMask);
             _wallFilter.useTriggers = false;
+        }
+
+        private static void Accelerate(
+            ref Vector2 velocity, 
+            Vector2 wishDir, 
+            float wishSpeed,
+            float acceleration, 
+            float delta)
+        {
+            float currentSpeed = Vector2.Dot(velocity, wishDir);
+            float addSpeed = wishSpeed - currentSpeed;
+
+            if (addSpeed <= 0f)
+                return;
+
+            float accelSpeed = acceleration * wishSpeed * delta;
+            accelSpeed = Mathf.Min(accelSpeed, addSpeed);
+
+            velocity += wishDir * accelSpeed;
+        }
+
+        private static void ApplyFriction(
+            ref Vector2 velocity,
+            float friction,
+            float stopSpeed,
+            float delta)
+        {
+            float speed = velocity.magnitude;
+
+            if (speed < 0.001f)
+            {
+                velocity = Vector2.zero;
+                return;
+            }
+
+            float control = Mathf.Max(speed, stopSpeed);
+            float drop = control * friction * delta;
+
+            float newSpeed = Mathf.Max(speed - drop, 0f);
+
+            if (newSpeed != speed)
+                velocity *= newSpeed / speed;
         }
 
 #if UNITY_EDITOR

@@ -26,6 +26,7 @@ namespace Game.Player.Movement.States
 
             if (state.BufferedJumpAvailable || input.JumpPressed)
             {
+                state.WallJumpTimer = Context.WallJumpAccelerationTimer;
                 Context.PerformWallJump(wallNormal, ref state);
                 state.MovementState = MovementState.Airborne;
             }
@@ -36,8 +37,22 @@ namespace Game.Player.Movement.States
             if (!Context.TryGetWallNormal(in state, out Vector2 wallNormal))
                 return;
 
+            float moveMultiplier = 0f;
+
+            if (Mathf.Abs(input.Move.x) > 0.2f)
+            {
+                float inputDotNormal = Vector2.Dot(wallNormal, new Vector2(input.Move.x, 0f));
+
+                if (inputDotNormal < 0.5f)
+                    state.WallStickTimer = Context.WallStickTimer;
+            }
+
+            if (!state.WallStickTimerAvailable)
+                moveMultiplier = 1f;
+
+
             Context.ApplyGravity(input.JumpHeld, ref state, delta, Context.WallSlideGravityMultiplier, Context.WallSlideSpeed);
-            Context.ApplyAirMovement(input.Move.x, ref state, delta);
+            Context.ApplyAirMovement(input.Move.x * moveMultiplier, ref state, delta, 1f);
 
             state.Velocity += -wallNormal * (Context.WallStickForce * delta);
             state.Velocity.y = Mathf.Max(state.Velocity.y, Context.MaxFallSpeed);
