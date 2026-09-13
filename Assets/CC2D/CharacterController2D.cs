@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CC2D
@@ -17,7 +18,8 @@ namespace CC2D
     public sealed class CharacterController2D : MonoBehaviour
     {
         [Header("Collision")]
-        [SerializeField] private LayerMask _collisionMask = ~0;
+        [SerializeField]
+        private LayerMask _collisionMask = ~0;
 
         [SerializeField, Min(0.0001f)]
         private float _skinWidth = 0.01f;
@@ -30,10 +32,10 @@ namespace CC2D
         private float _maxSlopeAngle = 50f;
 
         [SerializeField, Min(0f)]
-        private float _groundSnapDistance = 0.25f;
+        private float _groundProbeDistance = 0.03f;
 
         [SerializeField, Min(0f)]
-        private float _groundProbeDistance = 0.03f;
+        private float _groundSnapDistance = 0.25f;
 
         [Header("Precision")]
         [SerializeField, Min(0.000001f)]
@@ -41,70 +43,102 @@ namespace CC2D
 
         private const float MinBlockingDot = 0.0001f;
         private const float SamePlaneDot = 0.999f;
+        private const float HitTieEpsilon = 0.000001f;
 
-        private readonly RaycastHit2D[] _hits = new RaycastHit2D[32];
+        private readonly List<RaycastHit2D> _hits = new(32);
         private readonly Vector2[] _planes = new Vector2[8];
 
         private CapsuleCollider2D _capsule;
         private ContactFilter2D _filter;
 
-        private bool _disableGroundSnappingForNextMove;
+        private bool _skipGroundProbeForNextMove;
 
-        public CapsuleCollider2D Capsule => _capsule;
+        // Used so SnapToGround() can update Velocity from the complete
+        // displacement of the current simulation step.
+        private bool _hasMoveFrame;
+        private Vector2 _moveStartPosition;
+        private float _moveDelta;
 
         public bool IsGrounded { get; private set; }
 
-        public Vector2 GroundNormal { get; private set; } = Vector2.up;
+        public Vector2 GroundNormal { get; private set; } =
+            Vector2.up;
 
         public bool IsCollidingLeft { get; private set; }
+
         public bool IsCollidingRight { get; private set; }
 
         public Vector2 LeftWallNormal { get; private set; }
+
         public Vector2 RightWallNormal { get; private set; }
 
         /// <summary>
-        /// Actual velocity produced by the latest Move call.
-        /// Calculated from actual position difference / delta time.
+        /// Actual velocity produced by the current simulation step.
+        ///
+        /// Calculated from:
+        ///
+        ///     (currentPosition - positionBeforeMove) / delta
+        ///
+        /// SnapToGround() also updates this value if it is called
+        /// after Move().
         /// </summary>
         public Vector2 Velocity { get; private set; }
 
         public CollisionFlags2D CollisionFlags { get; private set; }
 
-        public Vector2 Position => transform.position;
-
-        public Vector2 Origin => Position + _capsule.offset;
+        public Vector2 Position =>
+            transform.position;
 
         private float MinGroundDot =>
             Mathf.Cos(_maxSlopeAngle * Mathf.Deg2Rad);
 
         private void Awake()
         {
-            _capsule = GetComponent<CapsuleCollider2D>();
+            _capsule =
+                GetComponent<CapsuleCollider2D>();
 
             RebuildFilter();
         }
 
         /// <summary>
-        /// Disables ground snapping for the next Move call.
-        /// The flag is automatically cleared afterward.
+        /// Explicitly tells the controller that the character intends
+        /// to leave the ground.
         ///
-        /// Call this when starting a jump.
+        /// This disables the automatic ground probe for the next
+        /// Move() only.
+        ///
+        /// Use this when jumping.
         /// </summary>
-        public void DisableGroundSnapping()
+        public void DetachFromGround()
         {
-            _disableGroundSnappingForNextMove = true;
+            _skipGroundProbeForNextMove = true;
+
+            IsGrounded = false;
+            GroundNormal = Vector2.up;
+
+            CollisionFlags &=
+                ~CollisionFlags2D.Below;
         }
 
-        public CollisionFlags2D Move(Vector2 delta)
-        {
-            return Move(delta, Time.deltaTime);
-        }
-
+        /// <summary>
+        /// Moves the controller by the supplied world-space displacement.
+        ///
+        /// delta is the simulation timestep and is used only to calculate
+        /// Velocity.
+        ///
+        /// Ground snapping is NOT performed here.
+        /// A non-moving ground probe IS performed after movement.
+        /// </summary>
         public CollisionFlags2D Move(
-            Vector2 delta,
-            float deltaTime)
+            Vector2 motion,
+            float delta)
         {
-
+            if (delta <= 0f)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(delta),
+                    "Simulation delta must be greater than zero.");
+            }
 
             Vector2 startPosition =
                 transform.position;
@@ -112,44 +146,27 @@ namespace CC2D
             Vector2 position =
                 startPosition;
 
-            bool disableGroundSnapping =
-                _disableGroundSnappingForNextMove;
+            _moveStartPosition =
+                startPosition;
 
-            // One-shot flag.
-            _disableGroundSnappingForNextMove =
+            _moveDelta =
+                delta;
+
+            _hasMoveFrame =
+                true;
+
+            bool skipGroundProbe =
+                _skipGroundProbeForNextMove;
+
+            _skipGroundProbeForNextMove =
                 false;
 
-            bool wasGrounded =
-                IsGrounded;
-
-            // Recover grounded state if we're extremely close to the
-            // floor, but don't do this on a jump frame.
-            if (!wasGrounded &&
-                !disableGroundSnapping &&
-                TryGetGround(
-                    position,
-                    _groundProbeDistance,
-                    out _,
-                    out _))
-            {
-                wasGrounded = true;
-            }
-
-            CollisionFlags = CollisionFlags2D.None;
-
-            IsGrounded = false;
-            GroundNormal = Vector2.up;
-
-            IsCollidingLeft = false;
-            IsCollidingRight = false;
-
-            LeftWallNormal = Vector2.zero;
-            RightWallNormal = Vector2.zero;
+            ResetCollisionState();
 
             int planeCount = 0;
 
             Vector2 remaining =
-                delta;
+                motion;
 
             // ========================================================
             // Collide and slide
@@ -188,6 +205,8 @@ namespace CC2D
                         direction,
                         normal);
 
+                // skinWidth represents distance perpendicular
+                // to the surface, not along the cast direction.
                 float skinAlongDirection =
                     approach > MinBlockingDot
                         ? _skinWidth / approach
@@ -229,12 +248,12 @@ namespace CC2D
                     if (Mathf.Abs(remaining.x) >
                         _minMoveDistance)
                     {
-                        // Preserve horizontal distance while converting
-                        // it into movement along the slope.
+                        // Preserve horizontal displacement when
+                        // converting movement onto the slope.
                         //
-                        // normal.x * x + normal.y * y = 0
+                        // n.x * x + n.y * y = 0
                         //
-                        // y = -(normal.x / normal.y) * x
+                        // y = -(n.x / n.y) * x
 
                         float slopeY =
                             -(normal.x / normal.y) *
@@ -271,8 +290,8 @@ namespace CC2D
                         remaining,
                         planeCount);
 
-                // Don't allow steep slopes to turn horizontal/downward
-                // movement into upward climbing.
+                // Don't allow a steep slope to convert horizontal or
+                // downward movement into upward movement.
                 if (IsSteepSlope(normal) &&
                     beforeClip.y <= 0f &&
                     remaining.y > 0f)
@@ -283,110 +302,161 @@ namespace CC2D
             }
 
             // ========================================================
-            // Ground snapping
+            // Apply movement
             // ========================================================
 
-            ResolveGround(
-                ref position,
-                wasGrounded,
-                disableGroundSnapping);
+            SetPosition(position);
+
+            RecalculateVelocity();
 
             // ========================================================
-            // Apply result
+            // Ground detection
             // ========================================================
+            //
+            // IMPORTANT:
+            //
+            // This does NOT move the character.
+            //
+            // IsGrounded therefore does not depend on whether
+            // SnapToGround() was called.
 
-            Vector3 finalPosition =
-                transform.position;
-
-            finalPosition.x = position.x;
-            finalPosition.y = position.y;
-
-            transform.position =
-                finalPosition;
-
-            Vector2 endPosition =
-                transform.position;
-
-            Velocity =
-                deltaTime > 0f
-                    ? (endPosition - startPosition) / deltaTime
-                    : Vector2.zero;
-
-            return CollisionFlags;
-        }
-
-        private void ResolveGround(
-            ref Vector2 position,
-            bool wasGrounded,
-            bool disableGroundSnapping)
-        {
-            // An explicit jump disables all ground attachment for this
-            // Move call.
-            if (disableGroundSnapping)
+            if (skipGroundProbe)
             {
                 IsGrounded = false;
                 GroundNormal = Vector2.up;
 
                 CollisionFlags &=
                     ~CollisionFlags2D.Below;
-
-                return;
+            }
+            else if (!IsGrounded)
+            {
+                ProbeGroundInternal(
+                    _groundProbeDistance);
             }
 
-            // If collide-and-slide already found a walkable floor, we're
-            // grounded already.
-            if (IsGrounded)
-                return;
+            return CollisionFlags;
+        }
 
-            // If we were grounded before moving, allow a larger downward
-            // snap. This is what keeps the character attached when:
-            //
-            // - descending a slope
-            // - stopping after moving uphill
-            // - moving over tiny discontinuities in the floor
-            if (wasGrounded &&
-                TryGetGround(
+        /// <summary>
+        /// Checks whether walkable ground is immediately beneath the
+        /// controller without moving it.
+        /// </summary>
+        public bool ProbeGround()
+        {
+            return ProbeGround(
+                _groundProbeDistance);
+        }
+
+        /// <summary>
+        /// Checks whether walkable ground exists within maxDistance
+        /// beneath the controller without moving it.
+        /// </summary>
+        public bool ProbeGround(
+            float maxDistance)
+        {
+            IsGrounded = false;
+            GroundNormal = Vector2.up;
+
+            CollisionFlags &=
+                ~CollisionFlags2D.Below;
+
+            return ProbeGroundInternal(
+                maxDistance);
+        }
+
+        /// <summary>
+        /// Explicitly snaps the controller down to nearby walkable ground.
+        ///
+        /// This is never called automatically by Move().
+        /// </summary>
+        public bool SnapToGround()
+        {
+            return SnapToGround(
+                _groundSnapDistance);
+        }
+
+        /// <summary>
+        /// Explicitly snaps the controller down to nearby walkable ground.
+        ///
+        /// If called after Move(), Velocity is recalculated from the
+        /// complete Move + Snap displacement.
+        /// </summary>
+        public bool SnapToGround(
+            float maxDistance)
+        {
+            if (maxDistance < 0f)
+                return false;
+
+            Vector2 position =
+                transform.position;
+
+            if (!TryGetGround(
                     position,
-                    _groundSnapDistance,
-                    out RaycastHit2D snapHit,
+                    maxDistance,
+                    out RaycastHit2D hit,
                     out float snapDistance))
             {
-                if (snapDistance > 0f)
-                {
-                    position +=
-                        Vector2.down * snapDistance;
-                }
-
-                SetGrounded(
-                    snapHit.normal);
-
-                return;
+                return false;
             }
 
-            // When airborne, only use a very small probe.
-            // This detects landings without magnetically pulling the
-            // character down from a significant distance.
-            if (TryGetGround(
-                    position,
-                    _groundProbeDistance,
-                    out RaycastHit2D groundHit,
-                    out float groundDistance))
+            if (snapDistance > 0f)
             {
-                if (groundDistance > 0f)
-                {
-                    position +=
-                        Vector2.down * groundDistance;
-                }
+                position +=
+                    Vector2.down * snapDistance;
 
-                SetGrounded(
-                    groundHit.normal);
-
-                return;
+                SetPosition(position);
             }
+
+            SetGrounded(
+                hit.normal);
+
+            RecalculateVelocity();
+
+            return true;
+        }
+
+        private bool ProbeGroundInternal(
+            float maxDistance)
+        {
+            if (maxDistance < 0f)
+                return false;
+
+            Vector2 position =
+                transform.position;
+
+            if (!TryGetGround(
+                    position,
+                    maxDistance,
+                    out RaycastHit2D hit,
+                    out _))
+            {
+                return false;
+            }
+
+            SetGrounded(
+                hit.normal);
+
+            return true;
+        }
+
+        private void ResetCollisionState()
+        {
+            CollisionFlags =
+                CollisionFlags2D.None;
 
             IsGrounded = false;
             GroundNormal = Vector2.up;
+
+            IsCollidingLeft = false;
+            IsCollidingRight = false;
+
+            LeftWallNormal = Vector2.zero;
+            RightWallNormal = Vector2.zero;
         }
+
+        // ============================================================
+        // Movement query
+        // ============================================================
 
         private bool CastMovement(
             Vector2 position,
@@ -403,8 +473,7 @@ namespace CC2D
             closestHit =
                 default;
 
-            float closestDistance =
-                float.PositiveInfinity;
+            bool found = false;
 
             for (int i = 0; i < count; i++)
             {
@@ -422,36 +491,133 @@ namespace CC2D
                         direction,
                         normal);
 
-                // Ignore surfaces we're moving parallel to or away from.
+                // Ignore surfaces that movement is tangent to or
+                // moving away from.
                 //
-                // This prevents the ground from repeatedly blocking
-                // tangent movement along slopes.
+                // This is particularly important when moving along
+                // floors and slopes.
                 if (approach <= MinBlockingDot)
                     continue;
 
-                if (hit.distance >=
-                    closestDistance)
+                if (!found ||
+                    IsBetterMovementHit(
+                        hit,
+                        closestHit,
+                        direction))
                 {
-                    continue;
+                    closestHit =
+                        hit;
+
+                    found =
+                        true;
                 }
+            }
 
-                closestDistance =
-                    hit.distance;
+            return found;
+        }
 
-                closestHit =
-                    hit;
+        private static bool IsBetterMovementHit(
+            RaycastHit2D candidate,
+            RaycastHit2D current,
+            Vector2 direction)
+        {
+            float distanceDifference =
+                candidate.distance -
+                current.distance;
+
+            if (distanceDifference <
+                -HitTieEpsilon)
+            {
+                return true;
+            }
+
+            if (distanceDifference >
+                HitTieEpsilon)
+            {
+                return false;
+            }
+
+            // If two contacts are effectively at the same distance,
+            // prefer the surface that blocks movement more strongly.
+            float candidateApproach =
+                -Vector2.Dot(
+                    direction,
+                    candidate.normal);
+
+            float currentApproach =
+                -Vector2.Dot(
+                    direction,
+                    current.normal);
+
+            float approachDifference =
+                candidateApproach -
+                currentApproach;
+
+            if (approachDifference >
+                HitTieEpsilon)
+            {
+                return true;
+            }
+
+            if (approachDifference <
+                -HitTieEpsilon)
+            {
+                return false;
+            }
+
+            // Stable geometry-based tie breaking.
+            //
+            // Do NOT use collider instance IDs here. Instance IDs are
+            // not guaranteed to match between multiplayer peers.
+
+            if (candidate.normal.y != current.normal.y)
+            {
+                return
+                    candidate.normal.y >
+                    current.normal.y;
+            }
+
+            if (candidate.normal.x != current.normal.x)
+            {
+                return
+                    candidate.normal.x <
+                    current.normal.x;
+            }
+
+            if (candidate.point.x != current.point.x)
+            {
+                return
+                    candidate.point.x <
+                    current.point.x;
             }
 
             return
-                closestHit.collider != null;
+                candidate.point.y <
+                current.point.y;
         }
+
+        // ============================================================
+        // Ground query
+        // ============================================================
 
         private bool TryGetGround(
             Vector2 position,
-            float maxSnapDistance,
+            float maxDistance,
             out RaycastHit2D closestHit,
-            out float snapDistance)
+            out float groundDistance)
         {
+            closestHit =
+                default;
+
+            groundDistance =
+                0f;
+
+            if (maxDistance < 0f)
+                return false;
+
+            // skinWidth is measured perpendicular to a surface.
+            //
+            // On a slope the equivalent vertical distance is larger.
             float skinCastDistance =
                 _skinWidth /
                 Mathf.Max(
@@ -459,7 +625,7 @@ namespace CC2D
                     0.01f);
 
             float castDistance =
-                maxSnapDistance +
+                maxDistance +
                 skinCastDistance;
 
             int count =
@@ -468,13 +634,10 @@ namespace CC2D
                     Vector2.down,
                     castDistance);
 
-            closestHit =
-                default;
+            bool found =
+                false;
 
-            snapDistance =
-                0f;
-
-            float closestDistance =
+            float bestGroundDistance =
                 float.PositiveInfinity;
 
             for (int i = 0; i < count; i++)
@@ -491,43 +654,101 @@ namespace CC2D
                 if (!IsWalkable(normal))
                     continue;
 
-                if (hit.distance >=
-                    closestDistance)
-                {
-                    continue;
-                }
-
                 float verticalSkinDistance =
                     _skinWidth /
                     Mathf.Max(
                         normal.y,
                         0.01f);
 
-                float candidateSnapDistance =
+                float candidateGroundDistance =
                     Mathf.Max(
                         hit.distance -
                         verticalSkinDistance,
                         0f);
 
-                if (candidateSnapDistance >
-                    maxSnapDistance)
+                if (candidateGroundDistance >
+                    maxDistance + HitTieEpsilon)
                 {
                     continue;
                 }
 
-                closestDistance =
-                    hit.distance;
+                if (!found ||
+                    IsBetterGroundHit(
+                        hit,
+                        candidateGroundDistance,
+                        closestHit,
+                        bestGroundDistance))
+                {
+                    closestHit =
+                        hit;
 
-                closestHit =
-                    hit;
+                    groundDistance =
+                        candidateGroundDistance;
 
-                snapDistance =
-                    candidateSnapDistance;
+                    bestGroundDistance =
+                        candidateGroundDistance;
+
+                    found =
+                        true;
+                }
+            }
+
+            return found;
+        }
+
+        private static bool IsBetterGroundHit(
+            RaycastHit2D candidate,
+            float candidateDistance,
+            RaycastHit2D current,
+            float currentDistance)
+        {
+            float distanceDifference =
+                candidateDistance -
+                currentDistance;
+
+            if (distanceDifference <
+                -HitTieEpsilon)
+            {
+                return true;
+            }
+
+            if (distanceDifference >
+                HitTieEpsilon)
+            {
+                return false;
+            }
+
+            // At an exact seam/corner, prefer the flatter walkable
+            // surface. This makes slope transitions more stable.
+            if (candidate.normal.y != current.normal.y)
+            {
+                return
+                    candidate.normal.y >
+                    current.normal.y;
+            }
+
+            if (candidate.normal.x != current.normal.x)
+            {
+                return
+                    candidate.normal.x <
+                    current.normal.x;
+            }
+
+            if (candidate.point.x != current.point.x)
+            {
+                return
+                    candidate.point.x <
+                    current.point.x;
             }
 
             return
-                closestHit.collider != null;
+                candidate.point.y <
+                current.point.y;
         }
+
+        // ============================================================
+        // Capsule query
+        // ============================================================
 
         private int CapsuleCast(
             Vector2 position,
@@ -554,6 +775,8 @@ namespace CC2D
             float angle =
                 transform.eulerAngles.z;
 
+            _hits.Clear();
+
             return Physics2D.CapsuleCast(
                 center,
                 size,
@@ -574,6 +797,7 @@ namespace CC2D
             Transform hitTransform =
                 hit.collider.transform;
 
+            // Ignore our own collider and character child colliders.
             if (hitTransform == transform ||
                 hitTransform.IsChildOf(transform))
             {
@@ -583,57 +807,67 @@ namespace CC2D
             return true;
         }
 
-        private void RegisterCollision(Vector2 normal)
+        // ============================================================
+        // Collision state
+        // ============================================================
+
+        private void RegisterCollision(
+            Vector2 normal)
         {
             if (IsWalkable(normal))
             {
-                CollisionFlags |= CollisionFlags2D.Below;
-
-                IsGrounded = true;
-                GroundNormal = normal;
+                SetGrounded(normal);
 
                 return;
             }
 
             if (normal.y < -0.01f)
             {
-                CollisionFlags |= CollisionFlags2D.Above;
+                CollisionFlags |=
+                    CollisionFlags2D.Above;
 
                 return;
             }
 
-            CollisionFlags |= CollisionFlags2D.Sides;
+            CollisionFlags |=
+                CollisionFlags2D.Sides;
 
-            // Collision normal points away from the wall.
+            // Collision normals point away from the surface.
             //
-            // Left wall:
+            // Positive X normal:
             //
-            // wall | -> normal
-            //      |  player
+            // wall | --> player
             //
-            // normal.x > 0
+            // Wall is on the left.
             if (normal.x > 0.01f)
             {
-                IsCollidingLeft = true;
-                LeftWallNormal = normal;
+                IsCollidingLeft =
+                    true;
+
+                LeftWallNormal =
+                    normal;
             }
 
-            // Right wall:
+            // Negative X normal:
             //
-            // player <- | wall
+            // player <-- | wall
             //
-            // normal.x < 0
+            // Wall is on the right.
             if (normal.x < -0.01f)
             {
-                IsCollidingRight = true;
-                RightWallNormal = normal;
+                IsCollidingRight =
+                    true;
+
+                RightWallNormal =
+                    normal;
             }
         }
 
         private void SetGrounded(
             Vector2 normal)
         {
-            IsGrounded = true;
+            IsGrounded =
+                true;
 
             GroundNormal =
                 normal.normalized;
@@ -646,7 +880,8 @@ namespace CC2D
             Vector2 normal)
         {
             return
-                normal.y >= MinGroundDot;
+                normal.y >=
+                MinGroundDot;
         }
 
         private bool IsSteepSlope(
@@ -656,6 +891,10 @@ namespace CC2D
                 normal.y > 0f &&
                 normal.y < MinGroundDot;
         }
+
+        // ============================================================
+        // Sliding planes
+        // ============================================================
 
         private void AddPlane(
             Vector2 normal,
@@ -707,8 +946,11 @@ namespace CC2D
                 }
             }
 
-            // Clipping against one surface can push us back into another
-            // at corners.
+            // Clipping against one surface may push movement into
+            // another surface at a corner.
+            //
+            // In 2D, if multiple non-parallel planes constrain the
+            // displacement, stop instead of oscillating between them.
             for (int i = 0;
                  i < planeCount;
                  i++)
@@ -716,7 +958,7 @@ namespace CC2D
                 if (Vector2.Dot(
                         result,
                         _planes[i]) <
-                    -0.0001f)
+                    -HitTieEpsilon)
                 {
                     return Vector2.zero;
                 }
@@ -724,6 +966,49 @@ namespace CC2D
 
             return result;
         }
+
+        // ============================================================
+        // Position / velocity
+        // ============================================================
+
+        private void SetPosition(
+            Vector2 position)
+        {
+            Vector3 worldPosition =
+                transform.position;
+
+            worldPosition.x =
+                position.x;
+
+            worldPosition.y =
+                position.y;
+
+            transform.position =
+                worldPosition;
+        }
+
+        private void RecalculateVelocity()
+        {
+            if (!_hasMoveFrame ||
+                _moveDelta <= 0f)
+            {
+                Velocity =
+                    Vector2.zero;
+
+                return;
+            }
+
+            Vector2 currentPosition =
+                transform.position;
+
+            Velocity =
+                (currentPosition - _moveStartPosition) /
+                _moveDelta;
+        }
+
+        // ============================================================
+        // Setup
+        // ============================================================
 
         private void RebuildFilter()
         {
@@ -745,15 +1030,15 @@ namespace CC2D
                     0.0001f,
                     _skinWidth);
 
-            _groundSnapDistance =
-                Mathf.Max(
-                    0f,
-                    _groundSnapDistance);
-
             _groundProbeDistance =
                 Mathf.Max(
                     0f,
                     _groundProbeDistance);
+
+            _groundSnapDistance =
+                Mathf.Max(
+                    0f,
+                    _groundSnapDistance);
 
             _minMoveDistance =
                 Mathf.Max(

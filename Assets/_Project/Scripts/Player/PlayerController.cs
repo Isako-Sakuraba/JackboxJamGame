@@ -45,7 +45,7 @@ namespace Game.Player
             public bool WasGrounded;
             public bool IsGrounded;
 
-            public bool IsWallSliding;
+            public bool IsWallSliding => MovementState == MovementState.WallSliding;
             public bool IsCollidingLeft;
             public bool IsCollidingRight;
             public Vector2 LeftWallNormal;
@@ -218,8 +218,6 @@ namespace Game.Player
 
             _movementMachine.TryTransition(in input, ref state, delta);
             _movementMachine.Tick(in input, ref state, delta);
-
-            state.IsWallSliding = state.MovementState == MovementState.WallSliding;
         }
 
         protected override void LateSimulate(PlayerInput input, ref PlayerState state, float delta)
@@ -247,7 +245,7 @@ namespace Game.Player
             state.CoyoteTimer = 0f;
             state.Jumped = true;
             state.Velocity.y = Utils.GetJumpVelocity(_jumpHeight, AbsoluteGravity);
-            _motor.DisableGroundSnapping();
+            _motor.DetachFromGround();
         }
 
         public void PerformWallJump(Vector2 wallNormal, ref PlayerState state)
@@ -256,10 +254,9 @@ namespace Game.Player
             state.CoyoteTimer = 0f;
             state.WallStickTimer = 0f;
             state.Jumped = true;
-            state.IsWallSliding = false;
-            state.Velocity = wallNormal * _wallJumpNormalForce;
+            float jumpDirection = wallNormal.x >= 0f ? 1f : -1f;
+            state.Velocity.x = jumpDirection * _wallJumpNormalForce;
             state.Velocity.y = Utils.GetJumpVelocity(_wallJumpHeight, AbsoluteGravity);
-            _motor.DisableGroundSnapping();
         }
 
         public void ApplyGravity(
@@ -354,14 +351,18 @@ namespace Game.Player
             bool hasRayLeft = TryProbeWall(Vector2.left, out Vector2 rayLeftNormal);
             bool hasRayRight = TryProbeWall(Vector2.right, out Vector2 rayRightNormal);
 
-            Debug.Log($"Has ray left: {hasRayLeft}");
+            //state.IsGrounded = _motor.IsGrounded;
+            //state.IsCollidingLeft = hasRayLeft || _motor.IsCollidingLeft;
+            //state.IsCollidingRight = hasRayRight || _motor.IsCollidingRight;
+            //state.LeftWallNormal = hasRayLeft ? rayLeftNormal : _motor.LeftWallNormal;
+            //state.RightWallNormal = hasRayRight ? rayRightNormal : _motor.RightWallNormal;
+            //state.IsWallSliding = state.MovementState == MovementState.WallSliding;
 
             state.IsGrounded = _motor.IsGrounded;
-            state.IsCollidingLeft = hasRayLeft || _motor.IsCollidingLeft;
-            state.IsCollidingRight = hasRayRight || _motor.IsCollidingRight;
-            state.LeftWallNormal = hasRayLeft ? rayLeftNormal : _motor.LeftWallNormal;
-            state.RightWallNormal = hasRayRight ? rayRightNormal : _motor.RightWallNormal;
-            state.IsWallSliding = state.MovementState == MovementState.WallSliding;
+            state.IsCollidingLeft = hasRayLeft;
+            state.IsCollidingRight = hasRayRight;
+            state.LeftWallNormal = hasRayLeft ? rayLeftNormal : Vector2.zero;
+            state.RightWallNormal = hasRayRight ? rayRightNormal : Vector2.zero;
         }
 
         private bool TryProbeWall(Vector2 direction, out Vector2 wallNormal)

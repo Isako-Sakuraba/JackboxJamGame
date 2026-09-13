@@ -34,7 +34,7 @@ namespace Game.Player
             SetDisplayNameOnClients(_displayName);
         }
 
-        [ObserversRpc]
+        [ObserversRpc(bufferLast: true)]
         private void SetDisplayNameOnClients(string name)
         {
             _displayName = name;

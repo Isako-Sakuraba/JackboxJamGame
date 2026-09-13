@@ -46,6 +46,10 @@ namespace Game.Player.Movement.States
                 if (inputDotNormal < 0.5f)
                     state.WallStickTimer = Context.WallStickTimer;
             }
+            else
+            {
+                state.WallStickTimer = Context.WallStickTimer;
+            }
 
             if (!state.WallStickTimerAvailable)
                 moveMultiplier = 1f;
