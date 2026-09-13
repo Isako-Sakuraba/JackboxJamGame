@@ -1718,7 +1718,7 @@ MonoBehaviour:
   _predictionPolicySource: 0
   _predictionPolicy: 0
   _desyncPolicy: 0
-  _playerPrefab: {fileID: 3117929452709367691, guid: e220ec411ae96fc4aacb9872222fe727, type: 3}
+  _playerPrefab: {fileID: 3117929452709367691, guid: 7180b3570274509458bb33ab9d32ec79, type: 3}
   _destroyOnDisconnect: 0
   spawnPoints: []
   _waitForSpawnCall: 0
