@@ -2228,7 +2228,7 @@ MonoBehaviour:
   _parent: {fileID: 0}
   _invertedPathToNearestParent: 
   _directChildren: []
-  _physicsProvider: 0
+  _physicsProvider: 2
   _updateViewMode: 1
   _builtInSystems: 63
   _predictedPrefabs: {fileID: 11400000, guid: 43ff4c976272e9d4281b3aa3215aa0b9, type: 2}

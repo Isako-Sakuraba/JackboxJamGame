@@ -422,9 +422,9 @@ GameObject:
   m_Component:
   - component: {fileID: 6117148581298859934}
   - component: {fileID: 8603205996886712555}
+  - component: {fileID: 7156360464925281167}
   - component: {fileID: 7491735953851549860}
   - component: {fileID: 2433791428283974601}
-  - component: {fileID: 7156360464925281167}
   - component: {fileID: 5775641456629789541}
   m_Layer: 7
   m_Name: PhysicalBody
@@ -471,6 +471,33 @@ MonoBehaviour:
     correctionRate: 8
     snapPositionThreshold: 3
     snapRotationThreshold: 75
+--- !u!50 &7156360464925281167
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8519324735334471084}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 6200000, guid: 66f703e6ab955144490468d92cc1c018, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 1
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 4
 --- !u!114 &7491735953851549860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -525,33 +552,6 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.5}
   m_Size: {x: 0.5, y: 1}
   m_Direction: 0
---- !u!50 &7156360464925281167
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8519324735334471084}
-  m_BodyType: 0
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 1
-  m_SleepingMode: 1
-  m_CollisionDetection: 1
-  m_Constraints: 4
 --- !u!114 &5775641456629789541
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -569,8 +569,34 @@ MonoBehaviour:
   _repeatInputFactor: 0.8
   _extrapolateInput: 1
   _body: {fileID: 7491735953851549860}
-  _moveSpeed: 6
-  _jumpImpulse: 8
+  _rigidbody: {fileID: 7156360464925281167}
+  _collider: {fileID: 2433791428283974601}
+  _groundSpeed: 6
+  _groundAcceleration: 64
+  _groundFriction: 12
+  _stopSpeed: 0.02
+  _airSpeed: 6
+  _airAcceleration: 12
+  _maxFallSpeed: -12
+  _jumpHeight: 3.6
+  _gravity: -22
+  _jumpBuffer: 0.16
+  _coyoteTime: 0.12
+  _wallJumpHeight: 2
+  _wallJumpNormalForce: 6
+  _wallJumpAccelerationMultiplier: 0.4
+  _wallJumpAccelerationTimer: 0.8
+  _wallSlideGravityMultiplier: 1.2
+  _wallSlideSpeed: -3.4
+  _wallStickForce: 0.2
+  _wallStickTimer: 0.4
+  _collisionMask:
+    serializedVersion: 2
+    m_Bits: 1
+  _groundProbeDistance: 0.05
+  _wallProbeDistance: 0.026
+  _disableRigidbodyGravity: 1
+  _freezeRotation: 1
 --- !u!1 &8929181978747050801
 GameObject:
   m_ObjectHideFlags: 0
