@@ -64,7 +64,7 @@ namespace Game.Player
 
         [Header("Dependencies")]
         [SerializeField] private Transform _origin;
-        [SerializeField] private PredictedRigidbody2D _body;
+        [SerializeField] private PredictedRigidbody2D _predictedBody;
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private Collider2D _collider;
 
@@ -134,7 +134,7 @@ namespace Game.Player
 
             return new PlayerState
             {
-                Velocity = _body != null ? _body.velocity : Vector2.zero,
+                Velocity = _predictedBody != null ? _predictedBody.velocity : Vector2.zero,
                 IsGrounded = isGrounded,
                 MovementState = isGrounded ? MovementState.Grounded : MovementState.Airborne
             };
@@ -142,14 +142,14 @@ namespace Game.Player
 
         protected override void GetUnityState(ref PlayerState state)
         {
-            if (_body != null)
-                state.Velocity = _body.velocity;
+            if (_predictedBody != null)
+                state.Velocity = _predictedBody.velocity;
         }
 
         protected override void SetUnityState(PlayerState state)
         {
-            if (_body != null)
-                _body.velocity = state.Velocity;
+            if (_predictedBody != null)
+                _predictedBody.velocity = state.Velocity;
         }
 
         protected override void SimulationStart()
@@ -198,20 +198,20 @@ namespace Game.Player
             TryTransition(in input, ref state);
             TickMovement(in input, ref state, delta);
 
-            if (_body != null)
+            if (_predictedBody != null)
             {
-                _positionBeforePhysics = _body.position;
-                _body.velocity = state.Velocity;
+                _positionBeforePhysics = _predictedBody.position;
+                _predictedBody.velocity = state.Velocity;
             }
         }
 
         protected override void LateSimulate(PlayerInput input, ref PlayerState state, float delta)
         {
-            if (_body != null)
+            if (_predictedBody != null)
             {
-                Vector2 afterMove = _body.position;
+                Vector2 afterMove = _predictedBody.position;
                 state.Velocity = delta > 0f ? (afterMove - _positionBeforePhysics) / delta : Vector2.zero;
-                _body.velocity = state.Velocity;
+                _predictedBody.velocity = state.Velocity;
             }
 
             bool wasGrounded = state.IsGrounded;
@@ -535,8 +535,8 @@ namespace Game.Player
             if (_origin == null)
                 _origin = transform;
 
-            if (_body == null)
-                _body = GetComponent<PredictedRigidbody2D>();
+            if (_predictedBody == null)
+                _predictedBody = GetComponent<PredictedRigidbody2D>();
 
             if (_rigidbody == null)
                 _rigidbody = GetComponent<Rigidbody2D>();
@@ -620,9 +620,17 @@ namespace Game.Player
                 velocity *= newSpeed / speed;
         }
 
-        public void Sim_Knokback(Vector2 direction, float force)
+        public void Sim_Knokback(
+            Vector2 direction, 
+            float directionalForce, 
+            float verticalForce)
         {
-            _rigidbody.AddForce(direction * force, ForceMode2D.Impulse);
+            Debug.Log("Applied Knockback!");
+            _predictedBody.AddForce(direction * directionalForce, ForceMode2D.Impulse);
+            _predictedBody.AddForce(Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity), ForceMode2D.Impulse);
+            //currentState.Velocity +=
+            //    (direction * directionalForce) +
+            //    (Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity));
         }
 #if UNITY_EDITOR
         private void OnValidate()

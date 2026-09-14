@@ -1,6 +1,7 @@
 using Game.Core;
 using Game.Services;
 using PurrNet.Prediction;
+using System;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.Serialization;
@@ -77,7 +78,8 @@ namespace Game.Player
         [SerializeField] private Vector2 _focusRadius = new Vector2(2f, 6f);
         [SerializeField] private Vector2 _damageRange = new Vector2(6f, 40f);
         [SerializeField] private float _overfocusDamage = 30f;
-        [SerializeField] private float _knockbackForce = 6f;
+        [SerializeField] private float _directionalKnockbackForce = 6f;
+        [SerializeField] private float _verticalKnockbackHeight = 2f;
         [SerializeField] private Transform _shutterOrigin;
         [SerializeField] private LayerMask _hitLayer;
         [SerializeField] private LayerMask _obstacleLayer;
@@ -92,10 +94,10 @@ namespace Game.Player
 
         private Camera _camera;
 
-        public PredictedEvent CameraStartedFocus;
-        public PredictedEvent CameraFocused;
-        public PredictedEvent CameraOverfocused;
-        public PredictedEvent CameraShot;
+        [NonSerialized] public PredictedEvent CameraStartedFocus;
+        [NonSerialized] public PredictedEvent CameraFocused;
+        [NonSerialized] public PredictedEvent CameraOverfocused;
+        [NonSerialized] public PredictedEvent CameraShot;
 
         public float FocusTime => _focusTime;
         public Vector2 FocusSpotAngle => _focusSpotAngle;
@@ -221,12 +223,13 @@ namespace Game.Player
             float spotAngle = Mathf.Lerp(_focusSpotAngle.x, _focusSpotAngle.y, t);
             float radius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
 
+            Shoot(ref state, radius, spotAngle);
+
             state.IsFocusing = false;
             state.FocusTimer = _focusTime;
             state.OverfocusResistanceTimer = _overfocusResistanceTime;
 
             CameraShot.Invoke();
-            Shoot(ref state, radius, spotAngle);
         }
 
         private void RebuildHitFilter()
@@ -259,9 +262,12 @@ namespace Game.Player
 
                 Debug.Log($"Looking at {overlap.name}");
 
-                PlayerReferences targetReferences = overlap.GetComponentInParent<PlayerReferences>();
+                PlayerReferences targetReferences = overlap.gameObject.GetComponent<PlayerReferences>();
                 if (targetReferences == null)
                     continue;
+
+                Debug.Log($"Target references are not null");
+
 
                 Vector2 origin = _shutterOrigin.position;
                 Vector2 targetPosition = overlap.bounds.center;
@@ -270,23 +276,37 @@ namespace Game.Player
                 if (Vector2.Angle(state.Direction, directionToTarget) > angle * 0.5f)
                     continue;
 
+                Debug.Log($"Angle is correct");
+
+
                 RaycastHit2D obstacleHit = Physics2D.Linecast(origin, targetPosition, _obstacleLayer);
+
                 if (obstacleHit.collider != null)
+                {
+                    Debug.Log($"Obstacle name: {obstacleHit.collider.gameObject.name}");
                     continue;
+                }
+
+                Debug.Log($"No obstacles in sight");
+
 
                 PlayerHealth targetHealth = targetReferences.PlayerHealth;
                 SimplePlayerController targetController = targetReferences.SimplePlayerController;
 
                 float damage = state.State switch
                 {
-                    FocusState.None => 0f,
                     FocusState.Focusing => Mathf.Lerp(_damageRange.x, _damageRange.y, GetFocusTimeNormalized(state)),
                     FocusState.Focused => _damageRange.y,
-                    FocusState.Overfocused => _overfocusDamage
+                    FocusState.Overfocused => _overfocusDamage,
+                    _ => 0f
                 };
 
+                Debug.Log($"Damaged {damage}");
                 targetHealth.Sim_Damage(damage);
-                targetController.Sim_Knokback(directionToTarget, _knockbackForce);
+                targetController.Sim_Knokback(
+                    directionToTarget, 
+                    _directionalKnockbackForce,
+                    _verticalKnockbackHeight);
             }
         }
 
