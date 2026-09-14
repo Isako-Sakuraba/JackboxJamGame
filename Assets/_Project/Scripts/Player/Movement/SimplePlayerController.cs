@@ -62,6 +62,7 @@ namespace Game.Player
         }
 
         [Header("Dependencies")]
+        [SerializeField] private Transform _origin;
         [SerializeField] private PredictedRigidbody2D _body;
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private Collider2D _collider;
@@ -107,6 +108,8 @@ namespace Game.Player
         private IInputService _inputService;
         private ContactFilter2D _collisionFilter;
         private Vector2 _positionBeforePhysics;
+
+        public Transform Origin => _origin;
 
         private float AbsoluteGravity => Mathf.Abs(_gravity);
 
@@ -218,6 +221,14 @@ namespace Game.Player
 
             if (state.IsGrounded)
                 state.CoyoteTimer = 0f;
+        }
+
+        protected override PlayerState Interpolate(PlayerState from, PlayerState to, float t)
+        {
+            var state = to;
+            state.Velocity = Vector2.Lerp(from.Velocity, to.Velocity, t);
+
+            return state;
         }
 
         private void TryTransition(in PlayerInput input, ref PlayerState state)
@@ -520,6 +531,9 @@ namespace Game.Player
 
         private void ResolveDependencies()
         {
+            if (_origin == null)
+                _origin = transform;
+
             if (_body == null)
                 _body = GetComponent<PredictedRigidbody2D>();
 

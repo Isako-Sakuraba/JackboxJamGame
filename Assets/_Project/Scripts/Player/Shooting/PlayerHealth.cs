@@ -21,6 +21,7 @@ namespace Game.Player
         public PredictedEvent<float> Damaged;
         public PredictedEvent<float> Died;
 
+        public float MaxHealth => _maxHealth;
         public bool IsDead => currentState.CurrentHealth <= 0;
 
         protected override void LateAwake()
@@ -52,6 +53,14 @@ namespace Game.Player
                 Sim_Died.Invoke();
                 Died.Invoke(damage);
             }
+        }
+
+        protected override HealthState Interpolate(HealthState from, HealthState to, float t)
+        {
+            var interpolated = to;
+            interpolated.CurrentHealth = to.CurrentHealth;
+
+            return interpolated;
         }
     }
 }
