@@ -1,49 +1,25 @@
 using PurrNet;
-using PurrNet.Lobby;
+using PurrNet.Prediction;
 using TMPro;
 using UnityEngine;
 
 namespace Game.Player 
 {
-    public class PlayerName : NetworkIdentity
+    public class PlayerName : StatelessPredictedIdentity
     {
         [SerializeField] private TMP_Text _nameText;
 
-        private string _displayName;
-
-        protected override void OnSpawned()
+        protected override void OnOwnerAssigned(PlayerID? player)
         {
-            if (!isOwner)
+            base.OnOwnerAssigned(player);
+
+            if (!owner.HasValue)
                 return;
 
-            string displayName = localPlayer.ToString();
-
-            if (GameOrchestrator.active != null 
-                && GameOrchestrator.active.sessionProvider != null)
+            if (PlayerDataManager.Players.TryGetValue(owner.Value, out var data))
             {
-                displayName = GameOrchestrator.active.sessionProvider.playerName;
+                _nameText.text = data.DisplayName;
             }
-
-            SetDisplayName(displayName);
-        }
-
-        [ServerRpc]
-        private void SetDisplayName(string name)
-        {
-            _displayName = name;
-            SetDisplayNameOnClients(_displayName);
-        }
-
-        [ObserversRpc(bufferLast: true)]
-        private void SetDisplayNameOnClients(string name)
-        {
-            _displayName = name;
-            UpdateDisplayName();
-        }
-
-        private void UpdateDisplayName()
-        {
-            _nameText.text = _displayName;
         }
     }
 }

@@ -873,7 +873,7 @@ MonoBehaviour:
   _destroyOnDisconnect: 1
   spawnPoints:
   - {fileID: 77468642}
-  _waitForSpawnCall: 0
+  _waitForSpawnCall: 1
   _targetGroup: {fileID: 1562482321}
   _playerRadius: 1.25
   _playerWeight: 1
@@ -884,19 +884,30 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77468641}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a1392aa1bc3d3b4a9ef31b6e6d8d4b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 53d3d70eb5edcae408e9630cdd8514a5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: PurrNet.Prediction::PurrNet.Prediction.PredictedPlayerSpawner
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.InitialSpawnTimer
   _predictionPolicySource: 0
   _predictionPolicy: 0
-  _desyncPolicy: 0
-  _playerPrefab: {fileID: 3117929452709367691, guid: 7180b3570274509458bb33ab9d32ec79, type: 3}
-  _destroyOnDisconnect: 1
-  spawnPoints:
-  - {fileID: 77468642}
-  _waitForSpawnCall: 0
+  _spawnTime: 3
+  _expectedPlayerCountFallback: 2
+  SimAllJoined:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 77468643}
+        m_TargetAssemblyTypeName: PurrNet.Prediction.AdvancedPlayerSpawner, Assembly-CSharp
+        m_MethodName: SpawnAllPlayers
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &85424991
 GameObject:
   m_ObjectHideFlags: 0
@@ -14194,6 +14205,76 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 2.1, y: 2.065}
   m_EdgeRadius: 0
+--- !u!1 &1987384547
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1987384549}
+  - component: {fileID: 1987384548}
+  m_Layer: 0
+  m_Name: PlayerDataManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1987384548
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987384547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7dcb51e8ba63a39488c195e7164c8e90, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerDataManager
+  _networkRules: {fileID: 0}
+  _visitiblityRules: {fileID: 0}
+  _isSetup: 0
+  _prefabId: -2147483648
+  _hasPrefabScope: 0
+  _prefabScope: 0
+  _componentIndex: -2147483648
+  _shouldBePooled: 0
+  _parent: {fileID: 0}
+  _invertedPathToNearestParent: 
+  _directChildren: []
+  _players:
+    _ownerAuth: 0
+    _ownerOnly: 0
+    _serializedDict:
+      keys: []
+      values: []
+      stringKeys: []
+      stringValues: []
+    _sendIntervalInSeconds: 0
+    _useForceSend: 0
+    _initialSerializedDict:
+      keys: []
+      values: []
+      stringKeys: []
+      stringValues: []
+--- !u!4 &1987384549
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987384547}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.56888, y: -0.49892, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1996373428
 GameObject:
   m_ObjectHideFlags: 0
@@ -15558,6 +15639,7 @@ SceneRoots:
   - {fileID: 1606253326}
   - {fileID: 91645009}
   - {fileID: 77468642}
+  - {fileID: 1987384549}
   - {fileID: 231566245}
   - {fileID: 1560210485}
   - {fileID: 501999969}

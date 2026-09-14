@@ -1,16 +1,128 @@
-using System.Collections.Generic;
+using Game.Player;
 using PurrNet.Logging;
 using PurrNet.Packing;
 using PurrNet.Pooling;
 using PurrNet.Utils;
-using Game.Player;
+using System;
+using System.Collections.Generic;
 using Unity.Cinemachine;
 using UnityEngine;
 
 namespace PurrNet.Prediction
 {
-    public class AdvancedPlayerSpawner : DeterministicIdentity<PlayerSpawnerState>
+    public class AdvancedPlayerSpawner : DeterministicIdentity<AdvancedPlayerSpawner.CustomSpawnerState>
     {
+        public struct CustomSpawnerState : IPredictedData<CustomSpawnerState>, IPredictedData, IDisposable, IPackedAuto, IMath<CustomSpawnerState>, IDuplicate<CustomSpawnerState>, IPurrEquatable<CustomSpawnerState>
+        {
+            public bool spawned;
+            public int spawnPointIndex;
+
+            public DisposableList<PlayerWithObject> values;
+
+            public PredictedObjectID this[PlayerID player]
+            {
+                set
+                {
+                    for (int i = 0; i < values.Count; i++)
+                    {
+                        PlayerWithObject value2 = values[i];
+                        if (value2.playerID == player)
+                        {
+                            value2.objectID = value;
+                            values[i] = value2;
+                            return;
+                        }
+                    }
+
+                    values.Add(new PlayerWithObject
+                    {
+                        objectID = value,
+                        playerID = player
+                    });
+                }
+            }
+
+            public void Dispose()
+            {
+                values.Dispose();
+            }
+
+            public CustomSpawnerState Duplicate()
+            {
+                return new CustomSpawnerState
+                {
+                    values = DisposableList<PlayerWithObject>.Create(values),
+                    spawnPointIndex = spawnPointIndex
+                };
+            }
+
+            public bool TryGetValue(PlayerID player, out PredictedObjectID o)
+            {
+                for (int i = 0; i < values.Count; i++)
+                {
+                    PlayerWithObject playerWithObject = values[i];
+                    if (playerWithObject.playerID == player)
+                    {
+                        o = playerWithObject.objectID;
+                        return true;
+                    }
+                }
+
+                o = default(PredictedObjectID);
+                return false;
+            }
+
+            public bool ContainsKey(PlayerID player)
+            {
+                for (int i = 0; i < values.Count; i++)
+                {
+                    if (values[i].playerID == player)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public void Remove(PlayerID player)
+            {
+                for (int i = 0; i < values.Count; i++)
+                {
+                    if (values[i].playerID == player)
+                    {
+                        values.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+
+            public CustomSpawnerState Add(CustomSpawnerState P_0, CustomSpawnerState P_1)
+            {
+                return P_0;
+            }
+
+            public CustomSpawnerState Negate(CustomSpawnerState P_0)
+            {
+                return P_0;
+            }
+
+            public CustomSpawnerState Scale(CustomSpawnerState P_0, float P_1)
+            {
+                return P_0;
+            }
+
+            public bool PurrEquals(CustomSpawnerState other)
+            {
+                if (other.spawnPointIndex != spawnPointIndex || !PurrEquality<DisposableList<PlayerWithObject>>.Equals(other.values, values))
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField, PurrLock] private bool _destroyOnDisconnect;
         [SerializeField] private List<Transform> spawnPoints = new List<Transform>();
@@ -51,9 +163,9 @@ namespace PurrNet.Prediction
                 OnPlayerLoadedScene(players[i]);
         }
 
-        protected override PlayerSpawnerState GetInitialState()
+        protected override CustomSpawnerState GetInitialState()
         {
-            return new PlayerSpawnerState
+            return new CustomSpawnerState
             {
                 spawnPointIndex = 0,
                 values = DisposableList<PlayerWithObject>.Create()
@@ -69,7 +181,7 @@ namespace PurrNet.Prediction
             }
         }
 
-        protected override PlayerSpawnerState Interpolate(PlayerSpawnerState from, PlayerSpawnerState to, float t)
+        protected override CustomSpawnerState Interpolate(CustomSpawnerState from, CustomSpawnerState to, float t)
             => to;
 
         private void CleanupSpawnPoints()
@@ -193,6 +305,8 @@ namespace PurrNet.Prediction
                 if (!currentState.ContainsKey(player))
                     SpawnPlayerInternal(player);
             }
+
+            currentState.spawned = true;
         }
 
         public void RespawnPlayer(PlayerID player)

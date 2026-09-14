@@ -193,20 +193,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 137886677890580952}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eb19b633c6a2faa40b9520ff9651c3c8, type: 3}
+  m_Script: {fileID: 11500000, guid: 7669bb7b562dbc64da640902145514b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerName
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _isSetup: 0
-  _prefabId: -2147483648
-  _hasPrefabScope: 0
-  _prefabScope: 0
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
   _nameText: {fileID: 4179958844236842869}
 --- !u!1 &156579249950082854
 GameObject:
@@ -632,17 +623,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 664821c5e6e23ea4494e745078141d13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerColor
-  _networkRules: {fileID: 0}
-  _visitiblityRules: {fileID: 0}
-  _isSetup: 0
-  _prefabId: -2147483648
-  _hasPrefabScope: 0
-  _prefabScope: 0
-  _componentIndex: -2147483648
-  _shouldBePooled: 0
-  _parent: {fileID: 0}
-  _invertedPathToNearestParent: 
-  _directChildren: []
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
   _renderers:
   - {fileID: 225556510639048526}
   _colors:
@@ -1044,8 +1026,8 @@ MonoBehaviour:
   _predictionPolicySource: 0
   _predictionPolicy: 0
   _identitiesToSpawn:
-  - {fileID: 5909560560957540831}
-  - {fileID: 4144636386098500252}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &983241538347168219
 MonoBehaviour:
   m_ObjectHideFlags: 0

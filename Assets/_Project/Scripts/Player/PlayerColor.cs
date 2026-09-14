@@ -1,9 +1,10 @@
 using PurrNet;
+using PurrNet.Prediction;
 using UnityEngine;
 
 namespace Game.Player
 {
-    public class PlayerColor : NetworkIdentity
+    public class PlayerColor : StatelessPredictedIdentity
     {
         private static readonly int PlayerColorId = Shader.PropertyToID("_PlayerColor");
 
@@ -25,14 +26,19 @@ namespace Game.Player
             ResolveRenderers();
         }
 
-        protected override void OnSpawned()
+        protected override void LateAwake()
         {
-            ApplyColor();
+            base.LateAwake();
+
+            if (!owner.HasValue)
+                return;
+
+            ApplyColor(owner);
         }
 
-        protected override void OnOwnerChanged(PlayerID? oldOwner, PlayerID? newOwner, bool asServer)
+        protected override void OnOwnerAssigned(PlayerID? player)
         {
-            ApplyColor(newOwner);
+            ApplyColor(player);
         }
 
         private void ApplyColor()
