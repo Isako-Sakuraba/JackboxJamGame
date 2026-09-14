@@ -77,6 +77,7 @@ namespace Game.Player
         [SerializeField] private Vector2 _focusSpotAngle = new Vector2(120f, 45f);
         [SerializeField] private Vector2 _focusRadius = new Vector2(2f, 6f);
         [SerializeField] private Vector2 _damageRange = new Vector2(6f, 40f);
+        [SerializeField] private Vector2 _velocityRange = new Vector2(2f, 12f);
         [SerializeField] private float _overfocusDamage = 30f;
         [SerializeField] private float _directionalKnockbackForce = 6f;
         [SerializeField] private float _verticalKnockbackHeight = 2f;
@@ -250,8 +251,6 @@ namespace Game.Player
                 _hitFilter, 
                 _colliderCache);
 
-            Debug.Log($"Overlaps count: {overlaps}");
-
 
             for (int i = 0; i < overlaps; i++)
             {
@@ -260,13 +259,9 @@ namespace Game.Player
                 if (overlap == _selfCollider)
                     continue;
 
-                Debug.Log($"Looking at {overlap.name}");
-
                 PlayerReferences targetReferences = overlap.gameObject.GetComponent<PlayerReferences>();
                 if (targetReferences == null)
                     continue;
-
-                Debug.Log($"Target references are not null");
 
 
                 Vector2 origin = _shutterOrigin.position;
@@ -276,23 +271,16 @@ namespace Game.Player
                 if (Vector2.Angle(state.Direction, directionToTarget) > angle * 0.5f)
                     continue;
 
-                Debug.Log($"Angle is correct");
-
 
                 RaycastHit2D obstacleHit = Physics2D.Linecast(origin, targetPosition, _obstacleLayer);
 
                 if (obstacleHit.collider != null)
-                {
-                    Debug.Log($"Obstacle name: {obstacleHit.collider.gameObject.name}");
                     continue;
-                }
-
-                Debug.Log($"No obstacles in sight");
-
 
                 PlayerHealth targetHealth = targetReferences.PlayerHealth;
                 SimplePlayerController targetController = targetReferences.SimplePlayerController;
 
+                // Damage calculations
                 float damage = state.State switch
                 {
                     FocusState.Focusing => Mathf.Lerp(_damageRange.x, _damageRange.y, GetFocusTimeNormalized(state)),
@@ -301,12 +289,29 @@ namespace Game.Player
                     _ => 0f
                 };
 
+                // Relative velocity multiplier
+                Vector2 myVelocity = _controller.currentState.Velocity;
+                Vector2 targetVelocity = targetController.currentState.Velocity;
+
+                Vector2 relativeVelocity = targetVelocity - myVelocity;
+                float relativeMagnitude = relativeVelocity.magnitude;
+                relativeMagnitude = Mathf.Clamp(relativeMagnitude, _velocityRange.x, _velocityRange.y);
+
+                float relativeVelocityMultiplier = 
+                    Mathf.InverseLerp(_velocityRange.x, _velocityRange.y, relativeMagnitude);
+
+                // Applying relative velocity multiplier
+                damage *= relativeVelocityMultiplier;
+
+                float directionalKnockback = relativeVelocityMultiplier * _directionalKnockbackForce;
+                float verticalKnockbackHeight = relativeVelocityMultiplier * _verticalKnockbackHeight;
+
                 Debug.Log($"Damaged {damage}");
                 targetHealth.Sim_Damage(damage);
                 targetController.Sim_Knokback(
                     directionToTarget, 
-                    _directionalKnockbackForce,
-                    _verticalKnockbackHeight);
+                    directionalKnockback,
+                    verticalKnockbackHeight);
             }
         }
 

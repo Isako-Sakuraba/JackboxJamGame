@@ -3,7 +3,6 @@ using Game.Player.Movement;
 using Game.Services;
 using Game.Utilities;
 using PurrNet.Prediction;
-using System;
 using UnityEngine;
 
 namespace Game.Player
@@ -625,12 +624,18 @@ namespace Game.Player
             float directionalForce, 
             float verticalForce)
         {
-            Debug.Log("Applied Knockback!");
-            _predictedBody.AddForce(direction * directionalForce, ForceMode2D.Impulse);
-            _predictedBody.AddForce(Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity), ForceMode2D.Impulse);
-            //currentState.Velocity +=
-            //    (direction * directionalForce) +
-            //    (Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity));
+            ////Debug.Log("Applied Knockback!");
+            //_predictedBody.AddForce(direction * directionalForce, ForceMode2D.Impulse);
+            //_predictedBody.AddForce(Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity), ForceMode2D.Impulse);
+
+            Vector2 knockback = 
+                (direction * directionalForce) + 
+                (Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity));
+
+            currentState.Velocity += knockback;
+
+            // Set to current velocity if experiencing issues with knockback
+            _predictedBody.velocity += knockback;
         }
 #if UNITY_EDITOR
         private void OnValidate()

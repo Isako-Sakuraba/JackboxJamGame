@@ -266,7 +266,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -326,8 +326,8 @@ Transform:
   m_GameObject: {fileID: 264354452654650256}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.455, y: 0, z: 0}
-  m_LocalScale: {x: 0.91000456, y: 0.0800001, z: 0.1}
+  m_LocalPosition: {x: 0.455, y: 0.008571744, z: 0}
+  m_LocalScale: {x: 0.91000456, y: 0.10286413, z: 0.1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6955385131848722872}
@@ -418,8 +418,8 @@ Transform:
   m_GameObject: {fileID: 528114492488797690}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.48, y: 0, z: 0}
-  m_LocalScale: {x: 0.039995797, y: 0.10002566, z: 1}
+  m_LocalPosition: {x: -0.48, y: 0.00999999, z: 0}
+  m_LocalScale: {x: 0.039995797, y: 0.12003022, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8363086788822557910}
@@ -450,7 +450,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -714,8 +714,8 @@ Transform:
   m_GameObject: {fileID: 1601317160714817088}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.475, y: 0, z: 0}
-  m_LocalScale: {x: 0.049995996, y: 0.10002566, z: 1}
+  m_LocalPosition: {x: 0.475, y: 0.00999999, z: 0}
+  m_LocalScale: {x: 0.049995996, y: 0.12003022, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8363086788822557910}
@@ -746,7 +746,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -999,7 +999,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: PurrNet.Prediction::PurrNet.Prediction.PredictionPolicyScope
   _inheritFromParent: 0
-  _predictionPolicy: 3
+  _predictionPolicy: 0
 --- !u!114 &418217491203489074
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1069,8 +1069,10 @@ MonoBehaviour:
   _focusSpotAngle: {x: 120, y: 28}
   _focusRadius: {x: 0.25, y: 6}
   _damageRange: {x: 6, y: 40}
+  _velocityRange: {x: 2, y: 11}
   _overfocusDamage: 30
-  _knockbackForce: 6
+  _directionalKnockbackForce: 12
+  _verticalKnockbackHeight: 3.6
   _shutterOrigin: {fileID: 7939761521407419720}
   _hitLayer:
     serializedVersion: 2
@@ -1106,14 +1108,14 @@ MonoBehaviour:
     stayCoefficient: 0.1
   _focusedLightSettings:
     color: {r: 1, g: 1, b: 1, a: 1}
-    Intensity: 10
-    transitionIntensity: 20
+    Intensity: 8
+    transitionIntensity: 16
     transitionTime: 0.32
     buildupCoefficient: 0.2
     stayCoefficient: 0.1
   _overfocusedLightSettings:
     color: {r: 1, g: 0.3226415, b: 0.3226415, a: 1}
-    Intensity: 8
+    Intensity: 6
     transitionIntensity: 8
     transitionTime: 1
     buildupCoefficient: 0.2
@@ -1810,10 +1812,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.SimplePlayerController
   _predictionPolicySource: 0
   _predictionPolicy: 0
-  _repeatInputFactor: 0.8
+  _repeatInputFactor: 1
   _extrapolateInput: 1
   _origin: {fileID: 2718064222907048906}
-  _body: {fileID: 7491735953851549860}
+  _predictedBody: {fileID: 7491735953851549860}
   _rigidbody: {fileID: 7156360464925281167}
   _collider: {fileID: 2433791428283974601}
   _groundSpeed: 12
