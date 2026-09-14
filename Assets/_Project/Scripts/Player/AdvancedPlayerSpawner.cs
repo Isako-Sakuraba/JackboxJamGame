@@ -144,11 +144,19 @@ namespace PurrNet.Prediction
 
         private void AddPlayerToTargetGroup(GameObject playerObject)
         {
-            var controller = playerObject.GetComponentInChildren<SimplePlayerController>();
+            var references = playerObject.GetComponent<PlayerReferences>();
+
+            if (!references)
+            {
+                PurrLogger.LogWarning($"Spawned player '{playerObject.name}' has no {nameof(PlayerReferences)} assigned.", this);
+                return;
+            }
+
+            var controller = references.SimplePlayerController;
 
             if (!controller)
             {
-                PurrLogger.LogWarning($"Spawned player '{playerObject.name}' has no {nameof(SimplePlayerController)} in its hierarchy.", this);
+                PurrLogger.LogWarning($"Spawned player '{playerObject.name}' has no {nameof(SimplePlayerController)} reference assigned.", this);
                 return;
             }
 

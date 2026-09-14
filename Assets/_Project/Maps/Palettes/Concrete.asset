@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c262ee7f8e7434b86bad393068a93c5, type: 3}
+  m_Name: Concrete
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Environment.MapPalette
+  <BaseColor>k__BackingField: {r: 0.5529412, g: 0.5568628, b: 0.57254905, a: 1}
+  <SecondaryColor>k__BackingField: {r: 0.34509805, g: 0.34901962, b: 0.36862746, a: 1}
+  <BackgroundColor>k__BackingField: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}

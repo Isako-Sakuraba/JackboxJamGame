@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="_Слой_1" data-name="Слой 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <rect class="cls-1" x="443.95" y="608.33" width="119.74" height="145.04"/>
+  <rect class="cls-1" x="443.95" y="327.11" width="119.74" height="158.09"/>
+  <polygon class="cls-1" points="960 93.5 1246.91 93.5 1246.91 309.5 960.5 309.5 960 93.5"/>
+</svg>

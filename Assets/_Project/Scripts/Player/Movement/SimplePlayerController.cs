@@ -3,6 +3,7 @@ using Game.Player.Movement;
 using Game.Services;
 using Game.Utilities;
 using PurrNet.Prediction;
+using System;
 using UnityEngine;
 
 namespace Game.Player
@@ -619,6 +620,10 @@ namespace Game.Player
                 velocity *= newSpeed / speed;
         }
 
+        public void Sim_Knokback(Vector2 direction, float force)
+        {
+            _rigidbody.AddForce(direction * force, ForceMode2D.Impulse);
+        }
 #if UNITY_EDITOR
         private void OnValidate()
         {

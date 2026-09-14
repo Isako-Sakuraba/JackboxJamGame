@@ -23,6 +23,14 @@ namespace Game.Player
             public void Dispose() { }
         }
 
+        public enum FocusState
+        {
+            None,
+            Focusing,
+            Focused,
+            Overfocused
+        }
+
         public struct WeaponState : IPredictedData<WeaponState>
         {
             public float FocusTimer;
@@ -33,9 +41,26 @@ namespace Game.Player
             public bool OverfocusResistanceAvailable => OverfocusResistanceTimer > 0f;
             public bool FocusTimerAvailable => FocusTimer > 0f;
 
+            public FocusState State
+            {
+                get
+                {
+                    if (!IsFocusing)
+                        return FocusState.None;
+
+                    if (FocusTimerAvailable)
+                        return FocusState.Focusing;
+
+                    if (OverfocusResistanceAvailable)
+                        return FocusState.Focused;
+
+                    return FocusState.Overfocused;
+                }
+            }
+
             public override string ToString()
             {
-                return $"FocusTimer: {FocusTimer}\nIsFocusing: {IsFocusing}";
+                return $"FocusTimer: {FocusTimer}\nIsFocusing: {IsFocusing}\nState: {State}";
             }
 
             public void Dispose() { }
@@ -43,13 +68,20 @@ namespace Game.Player
         #endregion
 
         [Header("Shutter Settings")]
+        [SerializeField] private SimplePlayerController _controller;
         [SerializeField] private float _focusTime = 1.2f;
         [SerializeField] private float _overfocusResistanceTime = 1f;
         [SerializeField] private float _overfocusDirectionPenaltyMultiplier = 0.2f;
         [FormerlySerializedAs("_focusAngle")]
         [SerializeField] private Vector2 _focusSpotAngle = new Vector2(120f, 45f);
         [SerializeField] private Vector2 _focusRadius = new Vector2(2f, 6f);
+        [SerializeField] private Vector2 _damageRange = new Vector2(6f, 40f);
+        [SerializeField] private float _overfocusDamage = 30f;
+        [SerializeField] private float _knockbackForce = 6f;
         [SerializeField] private Transform _shutterOrigin;
+        [SerializeField] private LayerMask _hitLayer;
+        [SerializeField] private LayerMask _obstacleLayer;
+        [SerializeField] private CapsuleCollider2D _selfCollider;
 
         [Header("Shutter Visuals")]
         [SerializeField] private Light2D _shutterLight;
@@ -71,11 +103,16 @@ namespace Game.Player
         public float RadiusMultiplier => _radiusMultiplier;
         public float SpotAngleMultiplier => _spotAngleMultiplier;
 
+        private Collider2D[] _colliderCache = new Collider2D[6];
+        private ContactFilter2D _hitFilter;
+
         public override void OnPreSetup()
         {
             base.OnPreSetup();
 
             _inputService = ServiceLocator.Get<IInputService>();
+
+            RebuildHitFilter();
         }
 
         protected override void LateAwake()
@@ -121,55 +158,135 @@ namespace Game.Player
 
         protected override void Simulate(WeaponInput input, ref WeaponState state, float delta)
         {
-            if (state.IsFocusing && !state.FocusTimerAvailable && state.OverfocusResistanceAvailable)
+            if (input.ShootPressed)
+                StartFocus(ref state);
+
+            if (!state.IsFocusing)
+                return;
+
+            UpdateFocusTimers(input, ref state, delta);
+
+            if (input.ShootHeld || input.ShootReleased)
+                UpdateDirection(input, ref state, delta);
+
+            if (input.ShootReleased)
+                ReleaseShot(ref state);
+        }
+
+        private void StartFocus(ref WeaponState state)
+        {
+            state.OverfocusResistanceTimer = _overfocusResistanceTime;
+            state.FocusTimer = _focusTime;
+            state.IsFocusing = true;
+            CameraStartedFocus.Invoke();
+        }
+
+        private void UpdateFocusTimers(WeaponInput input, ref WeaponState state, float delta)
+        {
+            if (state.FocusTimerAvailable && (input.ShootHeld || input.ShootReleased))
+            {
+                state.FocusTimer = Mathf.Max(0f, state.FocusTimer - delta);
+                if (!state.FocusTimerAvailable)
+                    CameraFocused.Invoke();
+            }
+
+            if (!state.FocusTimerAvailable && state.OverfocusResistanceAvailable)
             {
                 state.OverfocusResistanceTimer = Mathf.Max(0f, state.OverfocusResistanceTimer - delta);
                 if (!state.OverfocusResistanceAvailable)
                     CameraOverfocused.Invoke();
             }
+        }
 
-            if (input.ShootPressed)
+        private void UpdateDirection(WeaponInput input, ref WeaponState state, float delta)
+        {
+            if (state.State == FocusState.Overfocused)
             {
-                state.OverfocusResistanceTimer = _overfocusResistanceTime;
-                state.FocusTimer = _focusTime;
-                state.IsFocusing = true;
-                CameraStartedFocus.Invoke();
+                state.Direction = Vector3.Slerp(
+                    state.Direction,
+                    input.ShootDirection,
+                    delta * _overfocusDirectionPenaltyMultiplier);
+                return;
             }
 
-            if ((input.ShootHeld || input.ShootReleased) && state.IsFocusing)
+            state.Direction = input.ShootDirection;
+        }
+
+        private void ReleaseShot(ref WeaponState state)
+        {
+            float current = state.FocusTimer;
+            float max = _focusTime;
+            float t = current / max; // t is 1 means just started focus, t is 0 means finished
+            t = Mathf.Clamp01(1 - t);
+            float spotAngle = Mathf.Lerp(_focusSpotAngle.x, _focusSpotAngle.y, t);
+            float radius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
+
+            state.IsFocusing = false;
+            state.FocusTimer = _focusTime;
+            state.OverfocusResistanceTimer = _overfocusResistanceTime;
+
+            CameraShot.Invoke();
+            Shoot(ref state, radius, spotAngle);
+        }
+
+        private void RebuildHitFilter()
+        {
+            _hitFilter = new ContactFilter2D();
+            _hitFilter.SetLayerMask(_hitLayer);
+            _hitFilter.useTriggers = false;
+        }
+
+        private void Shoot(
+            ref WeaponState state,
+            float radius,
+            float angle)
+        {
+            int overlaps = Physics2D.OverlapCircle(
+                _shutterOrigin.transform.position, 
+                radius, 
+                _hitFilter, 
+                _colliderCache);
+
+            Debug.Log($"Overlaps count: {overlaps}");
+
+
+            for (int i = 0; i < overlaps; i++)
             {
-                if (state.FocusTimerAvailable)
+
+                Collider2D overlap = _colliderCache[i];
+                if (overlap == _selfCollider)
+                    continue;
+
+                Debug.Log($"Looking at {overlap.name}");
+
+                PlayerReferences targetReferences = overlap.GetComponentInParent<PlayerReferences>();
+                if (targetReferences == null)
+                    continue;
+
+                Vector2 origin = _shutterOrigin.position;
+                Vector2 targetPosition = overlap.bounds.center;
+                Vector2 directionToTarget = (targetPosition - origin).normalized;
+
+                if (Vector2.Angle(state.Direction, directionToTarget) > angle * 0.5f)
+                    continue;
+
+                RaycastHit2D obstacleHit = Physics2D.Linecast(origin, targetPosition, _obstacleLayer);
+                if (obstacleHit.collider != null)
+                    continue;
+
+                PlayerHealth targetHealth = targetReferences.PlayerHealth;
+                SimplePlayerController targetController = targetReferences.SimplePlayerController;
+
+                float damage = state.State switch
                 {
-                    state.FocusTimer = Mathf.Max(0f, state.FocusTimer - delta);
-                    if (!state.FocusTimerAvailable)
-                        CameraFocused.Invoke();
-                }
+                    FocusState.None => 0f,
+                    FocusState.Focusing => Mathf.Lerp(_damageRange.x, _damageRange.y, GetFocusTimeNormalized(state)),
+                    FocusState.Focused => _damageRange.y,
+                    FocusState.Overfocused => _overfocusDamage
+                };
 
-                if (!state.FocusTimerAvailable && !state.OverfocusResistanceAvailable)
-                {
-                    state.Direction = Vector3.Slerp(state.Direction, input.ShootDirection, delta * _overfocusDirectionPenaltyMultiplier);
-                }
-                else
-                {
-                    state.Direction = input.ShootDirection;
-                }
-            }
-
-            if (input.ShootReleased && state.IsFocusing)
-            {
-                float current = state.FocusTimer;
-                float max = _focusTime;
-                float t = current / max; // t is 1 means just started focus, t is 0 means finished
-                t = Mathf.Clamp01(1 - t);
-                float spotAngle = Mathf.Lerp(_focusSpotAngle.x, _focusSpotAngle.y, t);
-                float radius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
-
-                state.IsFocusing = false;
-                state.FocusTimer = _focusTime;
-                state.OverfocusResistanceTimer = _overfocusResistanceTime;
-
-                CameraShot.Invoke();
-                // Shoot or something
+                targetHealth.Sim_Damage(damage);
+                targetController.Sim_Knokback(directionToTarget, _knockbackForce);
             }
         }
 
@@ -183,5 +300,9 @@ namespace Game.Player
             return state;
         }
 
+        public float GetFocusTimeNormalized(WeaponState state)
+        {
+            return 1f - Mathf.Clamp01(state.FocusTimer / _focusTime);
+        }
     }
 }

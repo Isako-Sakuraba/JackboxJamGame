@@ -60,7 +60,7 @@ namespace Game.Player
 
         private void UpdateView(PlayerCameraWeapon.WeaponState viewState, PlayerCameraWeapon.WeaponState? verified)
         {
-            if (!viewState.IsFocusing)
+            if (viewState.State == PlayerCameraWeapon.FocusState.None)
                 return;
 
             float current = viewState.FocusTimer;
