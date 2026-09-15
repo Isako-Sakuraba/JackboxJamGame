@@ -1,4 +1,3 @@
-using PurrNet;
 using UnityEngine;
 
 namespace Game.Player
@@ -14,7 +13,7 @@ namespace Game.Player
 
         private void Subscribe()
         {
-            _health.Sim_Died += OnDied;
+            _health.Verified_Died += OnDied;
             _respawner.Sim_Respawned += OnRespawned;
         }
 
@@ -37,7 +36,7 @@ namespace Game.Player
 
         private void Unsubscribe()
         {
-            _health.Sim_Died -= OnDied;
+            _health.Verified_Died -= OnDied;
             _respawner.Sim_Respawned -= OnRespawned;
         }
 
@@ -47,7 +46,7 @@ namespace Game.Player
             _viewRoot.SetActive(true);
         }
 
-        private void OnDied(PlayerID id)
+        private void OnDied()
         {
             _particles.gameObject.SetActive(true);
             _particles.transform.position = _viewRoot.transform.position;

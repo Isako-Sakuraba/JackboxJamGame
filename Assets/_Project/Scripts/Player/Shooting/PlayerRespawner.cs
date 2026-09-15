@@ -22,6 +22,7 @@ namespace Game.Player
 
         public event Action Sim_Respawned = delegate { };
 
+
         [NonSerialized] public PredictedEvent Respawned;
 
         protected override void LateAwake()

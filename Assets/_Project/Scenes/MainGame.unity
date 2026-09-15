@@ -919,7 +919,7 @@ MonoBehaviour:
   _predictionPolicySource: 0
   _predictionPolicy: 0
   _spawnTime: 3
-  _expectedPlayerCountFallback: 2
+  _expectedPlayerCountFallback: 1
   SimAllJoined:
     m_PersistentCalls:
       m_Calls:

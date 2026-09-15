@@ -608,6 +608,8 @@ MonoBehaviour:
   _animator: {fileID: 7575683767765415745}
   _spriteRenderer: {fileID: 225556510639048526}
   _movementThreshold: 0.02
+  _speedRange: {x: 0, y: 7}
+  _multiplierRange: {x: 0.2, y: 1.6}
   _invertSlidingFlipping: 0
   _invertFallingFlipping: 0
   _invertRunningFlipping: 0
@@ -3265,6 +3267,7 @@ GameObject:
   - component: {fileID: 3067073916003826407}
   - component: {fileID: 8793236019712097653}
   - component: {fileID: 8535794285832675851}
+  - component: {fileID: 4804161006362443128}
   m_Layer: 7
   m_Name: PlayerRigidbody
   m_TagString: Untagged
@@ -3495,6 +3498,22 @@ MonoBehaviour:
   _predictionPolicy: 0
   _references: {fileID: 418217491203489074}
   _respawnTime: 3
+--- !u!114 &4804161006362443128
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3117929452709367691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 15780e97d72f9104db84d77a763c6fe6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.ColliderRollback
+  _storeHistoryInSeconds: 5
+  _autoAddAllChildren: 1
+  _colliders3D: []
+  _colliders2D: []
 --- !u!1 &3298431896035469643
 GameObject:
   m_ObjectHideFlags: 0

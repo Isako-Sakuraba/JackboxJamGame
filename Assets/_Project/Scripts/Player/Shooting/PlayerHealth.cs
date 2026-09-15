@@ -17,6 +17,11 @@ namespace Game.Player
             public bool IsRoundDead => IsDead && RoundLives <= 0;
             public bool IsGlobalDead => IsRoundDead && GlobalLives <= 0;
 
+            public override string ToString()
+            {
+                return $"CurrentHealth: {CurrentHealth} | GL: {GlobalLives} | RL: {RoundLives}";
+            }
+
             public void Dispose() { }
         }
 
@@ -26,6 +31,7 @@ namespace Game.Player
 
         public event Action<PlayerID, float> Sim_Damaged = delegate { };
         public event Action<PlayerID> Sim_Died = delegate { };
+        public event Action Verified_Died = delegate { };
         public event Action Sim_RoundDied = delegate { };
         public event Action Sim_GlobalDied = delegate { };
 
@@ -36,6 +42,8 @@ namespace Game.Player
 
         public float MaxHealth => _maxHealth;
         public bool IsDead => currentState.CurrentHealth <= 0;
+
+        bool _wasVerifiedDead = false;
 
         protected override void LateAwake()
         {
@@ -88,6 +96,21 @@ namespace Game.Player
                     Sim_GlobalDied.Invoke();
                 }
             }
+        }
+
+        protected override void UpdateView(HealthState viewState, HealthState? verified)
+        {
+            if (!verified.HasValue)
+                return;
+
+            bool isVerifiedDead = verified.Value.IsDead;
+
+            if (isVerifiedDead && !_wasVerifiedDead)
+            {
+                Verified_Died.Invoke();
+            }
+
+            _wasVerifiedDead = isVerifiedDead;
         }
 
         protected override HealthState Interpolate(HealthState from, HealthState to, float t)
