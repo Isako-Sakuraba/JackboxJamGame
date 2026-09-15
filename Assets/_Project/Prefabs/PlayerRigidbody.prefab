@@ -943,6 +943,8 @@ GameObject:
   - component: {fileID: 2379437904327071007}
   - component: {fileID: 5803788775155236712}
   - component: {fileID: 3067073916003826407}
+  - component: {fileID: 8793236019712097653}
+  - component: {fileID: 8535794285832675851}
   m_Layer: 7
   m_Name: PlayerRigidbody
   m_TagString: Untagged
@@ -997,6 +999,7 @@ MonoBehaviour:
   _playerHealth: {fileID: 5803788775155236712}
   _simplePlayerController: {fileID: 5775641456629789541}
   _playerCameraWeapon: {fileID: 983241538347168219}
+  _playerRespawner: {fileID: 0}
 --- !u!114 &182012864943874995
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1128,6 +1131,8 @@ MonoBehaviour:
   _predictionPolicySource: 0
   _predictionPolicy: 0
   _maxHealth: 100
+  _maxGlobalLives: 3
+  _maxRoundLives: 3
 --- !u!114 &3067073916003826407
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1142,6 +1147,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerHealthView
   _playerHealth: {fileID: 5803788775155236712}
   _target: {fileID: 6955385131848722872}
+--- !u!114 &8793236019712097653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3117929452709367691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0289ccb59a339594aa369d7a56faee06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerScoreKeeper
+--- !u!114 &8535794285832675851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3117929452709367691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6bc29d6c4a63f7e4da37e434bbaa50d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerRespawner
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
+  _references: {fileID: 418217491203489074}
+  _respawnTime: 3
 --- !u!1 &3298431896035469643
 GameObject:
   m_ObjectHideFlags: 0
@@ -1841,6 +1874,7 @@ MonoBehaviour:
   _playerHealth: {fileID: 5803788775155236712}
   _simplePlayerController: {fileID: 5775641456629789541}
   _playerCameraWeapon: {fileID: 983241538347168219}
+  _playerRespawner: {fileID: 0}
 --- !u!1 &8929181978747050801
 GameObject:
   m_ObjectHideFlags: 0

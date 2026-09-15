@@ -10,7 +10,8 @@ namespace Game.Player
 {
     public class PlayerCameraWeapon : PredictedIdentity<
         PlayerCameraWeapon.WeaponInput,
-        PlayerCameraWeapon.WeaponState>
+        PlayerCameraWeapon.WeaponState>,
+        IRespawnable
     {
         #region STATE AND INPUT
         public struct WeaponInput : IPredictedData<WeaponInput>
@@ -307,7 +308,7 @@ namespace Game.Player
                 float verticalKnockbackHeight = relativeVelocityMultiplier * _verticalKnockbackHeight;
 
                 Debug.Log($"Damaged {damage}");
-                targetHealth.Sim_Damage(damage);
+                targetHealth.Sim_Damage(owner.Value, damage);
                 targetController.Sim_Knokback(
                     directionToTarget, 
                     directionalKnockback,
@@ -328,6 +329,12 @@ namespace Game.Player
         public float GetFocusTimeNormalized(WeaponState state)
         {
             return 1f - Mathf.Clamp01(state.FocusTimer / _focusTime);
+        }
+
+        public void Respawn()
+        {
+            currentState = GetInitialState();
+            ResetInterpolation();
         }
     }
 }

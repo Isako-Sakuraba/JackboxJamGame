@@ -1,5 +1,7 @@
 using Game.Player;
+using Game.Services;
 using PurrNet.Logging;
+using PurrNet.Modules;
 using PurrNet.Packing;
 using PurrNet.Pooling;
 using PurrNet.Utils;
@@ -143,6 +145,13 @@ namespace PurrNet.Prediction
         }
 
         private void Awake() => CleanupSpawnPoints();
+
+        public override void OnPreSetup()
+        {
+            base.OnPreSetup();
+
+            ServiceLocator.Register(this);
+        }
 
         protected override void LateAwake()
         {
@@ -320,6 +329,40 @@ namespace PurrNet.Prediction
             }
 
             SpawnPlayerInternal(player);
+        }
+
+        public Vector2 GetSafestPosition()
+        {
+            Transform bestSpawn = null;
+            float bestScore = float.NegativeInfinity;
+
+            foreach (Transform spawnPoint in spawnPoints)
+            {
+                float nearestPlayerSqrDistance = float.PositiveInfinity;
+
+                foreach (var playerWithObject in currentState.values)
+                {
+                    PlayerID player = playerWithObject.playerID;
+                    PredictedObjectID pobject = playerWithObject.objectID;
+
+                    if (hierarchy.TryGetComponent<PlayerReferences>(pobject, out var references))
+                    {
+                        float sqrDistance = (spawnPoint.position 
+                            - references.SimplePlayerController.transform.position).sqrMagnitude;
+
+                        if (sqrDistance < nearestPlayerSqrDistance)
+                            nearestPlayerSqrDistance = sqrDistance;
+                    }
+                }
+
+                if (nearestPlayerSqrDistance > bestScore)
+                {
+                    bestScore = nearestPlayerSqrDistance;
+                    bestSpawn = spawnPoint;
+                }
+            }
+
+            return bestSpawn == null ? Vector2.zero : bestSpawn.position;
         }
     }
 }

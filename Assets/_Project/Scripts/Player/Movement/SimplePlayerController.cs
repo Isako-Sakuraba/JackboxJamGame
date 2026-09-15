@@ -11,7 +11,8 @@ namespace Game.Player
     [RequireComponent(typeof(PredictedRigidbody2D))]
     public class SimplePlayerController : PredictedIdentity<
         SimplePlayerController.PlayerInput,
-        SimplePlayerController.PlayerState>
+        SimplePlayerController.PlayerState>,
+        IRespawnable
     {
         public struct PlayerInput : IPredictedData<PlayerInput>
         {
@@ -637,6 +638,18 @@ namespace Game.Player
             // Set to current velocity if experiencing issues with knockback
             _predictedBody.velocity += knockback;
         }
+
+        public void Respawn()
+        {
+            currentState = GetInitialState();
+            ResetInterpolation();
+        }
+
+        public void Sim_SetPosition(Vector2 position)
+        {
+            _rigidbody.position = position;
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
