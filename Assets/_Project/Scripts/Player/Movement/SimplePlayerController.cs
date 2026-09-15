@@ -95,6 +95,7 @@ namespace Game.Player
         [Header("Wall Slide Settings")]
         [SerializeField] private float _wallSlideGravityMultiplier = 1.2f;
         [SerializeField] private float _wallSlideSpeed = -3.4f;
+        [SerializeField] private float _maxWallSlideSpeed = -8f;
         [SerializeField] private float _wallStickForce = 0.2f;
         [SerializeField] private float _wallStickTimer = 0.4f;
 
@@ -359,7 +360,9 @@ namespace Game.Player
             if (!state.WallStickTimerAvailable)
                 moveMultiplier = 1f;
 
-            ApplyGravity(ref state, delta, _wallSlideGravityMultiplier, _wallSlideSpeed);
+            float wallSlideSpeed = input.Move.y < -0.2f ? _maxWallSlideSpeed : _wallSlideSpeed;
+
+            ApplyGravity(ref state, delta, _wallSlideGravityMultiplier, wallSlideSpeed);
             ApplyAirMovement(input.Move.x * moveMultiplier, ref state, delta, 1f);
 
             state.Velocity += -wallNormal * (_wallStickForce * delta);
