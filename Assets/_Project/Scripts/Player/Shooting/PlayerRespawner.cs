@@ -20,6 +20,10 @@ namespace Game.Player
 
         private AdvancedPlayerSpawner _spawner;
 
+        public event Action Sim_Respawned = delegate { };
+
+        [NonSerialized] public PredictedEvent Respawned;
+
         protected override void LateAwake()
         {
             base.LateAwake();
@@ -29,6 +33,8 @@ namespace Game.Player
             _references.PlayerHealth.Sim_GlobalDied += Sim_OnGlobalDied;
 
             _spawner = ServiceLocator.Get<AdvancedPlayerSpawner>();
+
+            Respawned = new PredictedEvent(predictionManager, this);
         }
 
         protected override void Destroyed()
@@ -63,7 +69,7 @@ namespace Game.Player
 
         private void Sim_OnGlobalDied()
         {
-            Debug.Log("Someone has globally died!");
+
         }
 
         public void Sim_Respawn(bool fromDeath = true)
@@ -73,6 +79,9 @@ namespace Game.Player
             _references.PlayerCameraWeapon.Respawn();
             _references.SimplePlayerController.Respawn();
             _references.SimplePlayerController.Sim_SetPosition(position);
+
+            Sim_Respawned.Invoke();
+            Respawned.Invoke();
         }
     }
 }

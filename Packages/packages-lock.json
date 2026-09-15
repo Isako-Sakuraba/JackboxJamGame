@@ -305,7 +305,7 @@
       "dependencies": {
         "com.unity.nuget.mono-cecil": "1.11.4"
       },
-      "hash": "1787465ace7904bc2ab421c7c80a2f697e7bc8da"
+      "hash": "b7ac1a3bfd7774ee0ad86e1040339bfc7277a32c"
     },
     "dev.purrnet.purrlobby": {
       "version": "file:dev.purrnet.purrlobby",
@@ -314,7 +314,7 @@
       "dependencies": {}
     },
     "dev.purrnet.purrnet": {
-      "version": "https://github.com/PurrNet/PurrNet.git?path=/Assets/PurrNet#v1.23.0-beta.51",
+      "version": "https://github.com/PurrNet/PurrNet.git?path=/Assets/PurrNet#dev",
       "depth": 0,
       "source": "git",
       "dependencies": {
@@ -323,7 +323,7 @@
         "com.unity.collections": "2.6.2",
         "com.unity.mathematics": "1.3.2"
       },
-      "hash": "65538ec6d8df61054a3149fd015f46d7f622a739"
+      "hash": "0f5639afccf2ba9cbee82d6af4e697f83528f85c"
     },
     "dev.purrnet.services": {
       "version": "https://github.com/PurrNet/PurrServices.git?path=Assets/Tool#v1.1.2",

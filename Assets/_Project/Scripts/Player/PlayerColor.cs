@@ -36,9 +36,12 @@ namespace Game.Player
             ApplyColor(owner);
         }
 
-        protected override void OnOwnerAssigned(PlayerID? player)
+        public override void OnViewOwnerChanged(PlayerID? oldOwner, PlayerID? newOwner)
         {
-            ApplyColor(player);
+            base.OnViewOwnerChanged(oldOwner, newOwner);
+
+            if (newOwner.HasValue)
+                ApplyColor(owner.Value);
         }
 
         private void ApplyColor()

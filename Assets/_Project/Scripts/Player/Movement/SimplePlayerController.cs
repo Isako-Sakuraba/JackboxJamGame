@@ -66,6 +66,7 @@ namespace Game.Player
         [SerializeField] private Transform _origin;
         [SerializeField] private PredictedRigidbody2D _predictedBody;
         [SerializeField] private Rigidbody2D _rigidbody;
+        [SerializeField] private PredictedTransform _predictedTransform;
         [SerializeField] private Collider2D _collider;
 
         [Header("Ground Settings")]
@@ -543,6 +544,9 @@ namespace Game.Player
 
             if (_collider == null)
                 _collider = GetComponent<Collider2D>();
+
+            if (_predictedTransform == null)
+                _predictedTransform = GetComponent<PredictedTransform>();
         }
 
         private void ConfigureRigidbody()
@@ -647,7 +651,16 @@ namespace Game.Player
 
         public void Sim_SetPosition(Vector2 position)
         {
+            currentState.Velocity = Vector2.zero;
+            _predictedBody.velocity = Vector2.zero;
+            _rigidbody.linearVelocity = Vector2.zero;
+
             _rigidbody.position = position;
+            transform.position = position;
+
+            _predictedTransform.ResetInterpolation();
+            _predictedBody.ResetInterpolation();
+            _predictedTransform.graphics.position = position; // Very crude solution, but it works
         }
 
 #if UNITY_EDITOR

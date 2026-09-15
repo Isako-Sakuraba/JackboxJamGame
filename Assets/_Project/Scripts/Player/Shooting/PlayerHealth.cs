@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace Game.Player
 {
-
     public class PlayerHealth : PredictedIdentity<PlayerHealth.HealthState>, IRespawnable
     {
         public struct HealthState : IPredictedData<HealthState>
@@ -30,8 +29,8 @@ namespace Game.Player
         public event Action Sim_RoundDied = delegate { };
         public event Action Sim_GlobalDied = delegate { };
 
-        public PredictedEvent<float> Damaged;
-        public PredictedEvent Died;
+        [NonSerialized] public PredictedEvent<float> Damaged;
+        [NonSerialized] public PredictedEvent Died;
 
         public int FullLives => currentState.GlobalLives * _maxGlobalLives + currentState.RoundLives;
 
