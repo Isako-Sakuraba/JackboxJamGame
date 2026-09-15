@@ -81,6 +81,16 @@ namespace Game.Player
             }
         }
 
+        public void Sim_Heal(float heal)
+        {
+            if (IsDead)
+                return;
+
+            currentState.CurrentHealth += heal;
+
+            currentState.CurrentHealth = Mathf.Min(_maxHealth, currentState.CurrentHealth);
+        }
+
         private void Sim_HandleJustDied()
         {
             currentState.RoundLives = Mathf.Max(0, currentState.RoundLives - 1);

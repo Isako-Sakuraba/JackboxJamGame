@@ -20,6 +20,8 @@ namespace Game.Player
             public bool ShootHeld;
             public bool ShootReleased;
 
+            public double? LagCompensationTick;
+
             public Vector2 ShootDirection;
 
             public void Dispose() { }
@@ -70,6 +72,7 @@ namespace Game.Player
         #endregion
 
         [Header("Shutter Settings")]
+        [SerializeField] private PlayerHealth _health;
         [SerializeField] private SimplePlayerController _controller;
         [SerializeField] private float _focusTime = 1.2f;
         [SerializeField] private float _overfocusResistanceTime = 1f;
@@ -82,6 +85,7 @@ namespace Game.Player
         [SerializeField] private float _overfocusDamage = 30f;
         [SerializeField] private float _directionalKnockbackForce = 6f;
         [SerializeField] private float _verticalKnockbackHeight = 2f;
+        [SerializeField] private float _healOnKill = 36f;
         [SerializeField] private Transform _shutterOrigin;
         [SerializeField] private LayerMask _hitLayer;
         [SerializeField] private LayerMask _obstacleLayer;
@@ -134,7 +138,12 @@ namespace Game.Player
         protected override void UpdateInput(ref WeaponInput input)
         {
             input.ShootPressed |= _inputService.Shoot.Pressed;
-            input.ShootReleased |= _inputService.Shoot.Released;
+
+            if (_inputService.Shoot.Released)
+            {
+                input.ShootReleased = true;
+                input.LagCompensationTick ??= lagCompensationTick;
+            }
         }
 
         protected override WeaponState GetInitialState()
@@ -145,6 +154,9 @@ namespace Game.Player
         protected override void GetFinalInput(ref WeaponInput input)
         {
             input.ShootHeld = _inputService.Shoot.Held;
+
+            if (input.ShootReleased)
+                input.LagCompensationTick ??= lagCompensationTick;
 
             Vector2 screenPosition = _inputService.MousePosition;
 
@@ -158,6 +170,13 @@ namespace Game.Player
             Vector2 direction = (worldPosition - origin).normalized;
 
             input.ShootDirection = direction;
+        }
+
+        protected override void ModifyExtrapolatedInput(ref WeaponInput input)
+        {
+            input.ShootPressed = false;
+            input.ShootReleased = false;
+            input.LagCompensationTick = null;
         }
 
         protected override void Simulate(WeaponInput input, ref WeaponState state, float delta)
@@ -174,7 +193,7 @@ namespace Game.Player
                 UpdateDirection(input, ref state, delta);
 
             if (input.ShootReleased)
-                ReleaseShot(ref state);
+                ReleaseShot(input.LagCompensationTick, ref state);
         }
 
         private void StartFocus(ref WeaponState state)
@@ -216,7 +235,7 @@ namespace Game.Player
             state.Direction = input.ShootDirection;
         }
 
-        private void ReleaseShot(ref WeaponState state)
+        private void ReleaseShot(double? preciseTick, ref WeaponState state)
         {
             float current = state.FocusTimer;
             float max = _focusTime;
@@ -225,7 +244,7 @@ namespace Game.Player
             float spotAngle = Mathf.Lerp(_focusSpotAngle.x, _focusSpotAngle.y, t);
             float radius = Mathf.Lerp(_focusRadius.x, _focusRadius.y, t);
 
-            Shoot(ref state, radius, spotAngle);
+            Shoot(preciseTick, ref state, radius, spotAngle);
 
             state.IsFocusing = false;
             state.FocusTimer = _focusTime;
@@ -242,21 +261,31 @@ namespace Game.Player
         }
 
         private void Shoot(
+            double? preciseTick,
             ref WeaponState state,
             float radius,
             float angle)
         {
-            int overlaps = Physics2D.OverlapCircle(
-                _shutterOrigin.transform.position, 
+            if (!preciseTick.HasValue)
+            {
+                return;
+            }
+
+            Vector2 origin = _shutterOrigin.position;
+
+            int overlaps = predictionManager.lagCompensation.CircleOverlap(
+                preciseTick.Value, 
+                origin,
                 radius, 
-                _hitFilter, 
-                _colliderCache);
+                _colliderCache, 
+                _hitFilter);
 
 
             for (int i = 0; i < overlaps; i++)
             {
 
                 Collider2D overlap = _colliderCache[i];
+
                 if (overlap == _selfCollider)
                     continue;
 
@@ -264,15 +293,13 @@ namespace Game.Player
                 if (targetReferences == null)
                     continue;
 
-
-                Vector2 origin = _shutterOrigin.position;
-                Vector2 targetPosition = overlap.bounds.center;
+                Vector2 targetPosition = overlap.transform.position + (Vector3)overlap.offset;
                 Vector2 directionToTarget = (targetPosition - origin).normalized;
 
                 if (Vector2.Angle(state.Direction, directionToTarget) > angle * 0.5f)
                     continue;
 
-
+                // Obstacles are static, so no need for rollback module
                 RaycastHit2D obstacleHit = Physics2D.Linecast(origin, targetPosition, _obstacleLayer);
 
                 if (obstacleHit.collider != null)
@@ -307,12 +334,14 @@ namespace Game.Player
                 float directionalKnockback = relativeVelocityMultiplier * _directionalKnockbackForce;
                 float verticalKnockbackHeight = relativeVelocityMultiplier * _verticalKnockbackHeight;
 
-                Debug.Log($"Damaged {damage}");
                 targetHealth.Sim_Damage(owner.Value, damage);
                 targetController.Sim_Knokback(
                     directionToTarget, 
                     directionalKnockback,
                     verticalKnockbackHeight);
+
+                if (targetHealth.currentState.IsDead)
+                    _health.Sim_Heal(_healOnKill);
             }
         }
 

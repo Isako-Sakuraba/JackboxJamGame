@@ -21,9 +21,12 @@ namespace Game.Player
         private AdvancedPlayerSpawner _spawner;
 
         public event Action Sim_Respawned = delegate { };
+        public event Action View_Respawned = delegate { };
 
 
         [NonSerialized] public PredictedEvent Respawned;
+
+        private bool _wasViewRespawning;
 
         protected override void LateAwake()
         {
@@ -56,6 +59,19 @@ namespace Game.Player
                     Sim_Respawn();
                 }
             }
+        }
+
+        protected override void UpdateView(RespawnState viewState, RespawnState? verified)
+        {
+            if (!verified.HasValue)
+                return;
+
+            bool isViewRespawning = verified.Value.RespawnTimer > 0f;
+
+            if (!isViewRespawning && _wasViewRespawning)
+                View_Respawned.Invoke();
+
+            _wasViewRespawning = isViewRespawning;
         }
 
         private void Sim_OnDied(PlayerID iD)
