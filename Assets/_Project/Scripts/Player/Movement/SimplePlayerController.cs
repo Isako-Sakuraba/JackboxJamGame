@@ -1,4 +1,5 @@
 using Game.Core;
+using Game.Environment;
 using Game.Player.Movement;
 using Game.Services;
 using Game.Utilities;
@@ -109,6 +110,7 @@ namespace Game.Player
         private readonly RaycastHit2D[] _hits = new RaycastHit2D[8];
 
         private IInputService _inputService;
+        private TutorialDummy _tutorialDummy;
         private PlayerHealth _health;
         private PlayerLifeManager _lifeManager;
         private ContactFilter2D _collisionFilter;
@@ -122,6 +124,7 @@ namespace Game.Player
         {
             ResolveDependencies();
             _health = GetComponentInParent<PlayerReferences>()?.PlayerHealth;
+            _tutorialDummy = GetComponentInParent<TutorialDummy>();
             RebuildCollisionFilter();
             ConfigureRigidbody();
         }
@@ -165,8 +168,28 @@ namespace Game.Player
             state.MovementState = state.IsGrounded ? MovementState.Grounded : MovementState.Airborne;
         }
 
+        protected override void LateAwake()
+        {
+            base.LateAwake();
+            _predictedBody.onTriggerEnter += Sim_OnTriggerEnter;
+        }
+
+        protected override void Destroyed()
+        {
+            if (_predictedBody != null)
+                _predictedBody.onTriggerEnter -= Sim_OnTriggerEnter;
+
+            base.Destroyed();
+        }
+
         protected override void UpdateInput(ref PlayerInput input)
         {
+            if (_tutorialDummy != null)
+            {
+                input = default;
+                return;
+            }
+
             if (IsGameplayLocked())
             {
                 input = default;
@@ -179,6 +202,12 @@ namespace Game.Player
 
         protected override void GetFinalInput(ref PlayerInput input)
         {
+            if (_tutorialDummy != null)
+            {
+                input = _tutorialDummy.GetInput();
+                return;
+            }
+
             if (IsGameplayLocked())
             {
                 input = default;
@@ -675,6 +704,30 @@ namespace Game.Player
 
             // Set to current velocity if experiencing issues with knockback
             _predictedBody.velocity += knockback;
+        }
+
+        public void Sim_ApplyImpulse(Vector2 impulse)
+        {
+            if (IsGameplayLocked())
+                return;
+
+            Vector2 velocityChange = impulse / _predictedBody.rigidbody.mass;
+            currentState.Velocity += velocityChange;
+            _predictedBody.AddForce(impulse, ForceMode2D.Impulse);
+        }
+
+        private void Sim_OnTriggerEnter(GameObject other)
+        {
+            if (other == null)
+                return;
+
+            JumpPad jumpPad = other.GetComponentInParent<JumpPad>();
+            if (jumpPad != null)
+                Sim_ApplyImpulse(jumpPad.Impulse);
+
+            TutorialExit tutorialExit = other.GetComponentInParent<TutorialExit>();
+            if (_tutorialDummy == null && tutorialExit != null)
+                tutorialExit.Sim_Trigger();
         }
 
         private bool IsGameplayLocked()

@@ -12,6 +12,7 @@ namespace Game.Player
         {
             public float InvincibilityTimer;
             public float CurrentHealth;
+            public PlayerID LastDamageFrom;
 
             public bool IsInvincible => InvincibilityTimer > 0f;
             public bool IsDead => CurrentHealth <= 0f;
@@ -31,6 +32,7 @@ namespace Game.Player
         public event Action<PlayerID> Sim_Died = delegate { };
         public event Action Verified_Died = delegate { };
         public event Action Verified_Respawned = delegate { };
+        public static event Action<PlayerID> Verified_Kill = delegate { };
 
         [NonSerialized] public PredictedEvent<float> Damaged;
         [NonSerialized] public PredictedEvent Died;
@@ -79,6 +81,7 @@ namespace Game.Player
                 return;
 
             currentState.CurrentHealth -= damage;
+            currentState.LastDamageFrom = from;
             Sim_Damaged.Invoke(from, damage);
             Damaged.Invoke(damage);
 
@@ -111,6 +114,8 @@ namespace Game.Player
             if (isVerifiedDead && !_wasVerifiedDead)
             {
                 Verified_Died.Invoke();
+                if (!owner.HasValue || owner.Value != verified.Value.LastDamageFrom)
+                    Verified_Kill.Invoke(verified.Value.LastDamageFrom);
             }
             else if (!isVerifiedDead && _wasVerifiedDead)
             {

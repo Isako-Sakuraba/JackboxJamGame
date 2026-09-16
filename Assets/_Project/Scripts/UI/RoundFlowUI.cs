@@ -17,6 +17,9 @@ namespace Game.UI
         [SerializeField] private GameObject _roundEndPanel;
         [SerializeField] private TMP_Text _roundEndText;
         [SerializeField] private PlayerScore _playerScore;
+        [SerializeField] private AudioSource _winAudioSource;
+        [SerializeField] private AudioClip _winClip;
+        [SerializeField] private List<ParticleSystem> _winParticles = new();
 
         private readonly StringBuilder _text = new();
         private MapChanger _mapChanger;
@@ -57,6 +60,19 @@ namespace Game.UI
             _mapChangePanel.SetActive(false);
             _roundEndPanel.SetActive(true);
             _roundEndText.text = "Calculating results...";
+
+            if (_winAudioSource && _winClip)
+            {
+                _winAudioSource.clip = _winClip;
+                _winAudioSource.Play();
+            }
+
+            foreach (ParticleSystem particle in _winParticles)
+            {
+                if (particle)
+                    particle.Play();
+            }
+
             StartCoroutine(UpdateWinnerTextNextFrame());
         }
 
