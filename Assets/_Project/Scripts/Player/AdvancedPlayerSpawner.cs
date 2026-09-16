@@ -53,6 +53,7 @@ namespace PurrNet.Prediction
             {
                 return new CustomSpawnerState
                 {
+                    spawned = spawned,
                     values = DisposableList<PlayerWithObject>.Create(values),
                     spawnPointIndex = spawnPointIndex
                 };
@@ -116,7 +117,7 @@ namespace PurrNet.Prediction
 
             public bool PurrEquals(CustomSpawnerState other)
             {
-                if (other.spawnPointIndex != spawnPointIndex || !PurrEquality<DisposableList<PlayerWithObject>>.Equals(other.values, values))
+                if (other.spawned != spawned || other.spawnPointIndex != spawnPointIndex || !PurrEquality<DisposableList<PlayerWithObject>>.Equals(other.values, values))
                 {
                     return false;
                 }
@@ -333,6 +334,8 @@ namespace PurrNet.Prediction
 
         public Vector2 GetSafestPosition()
         {
+            CleanupSpawnPoints();
+
             Transform bestSpawn = null;
             float bestScore = float.NegativeInfinity;
 
@@ -363,6 +366,36 @@ namespace PurrNet.Prediction
             }
 
             return bestSpawn == null ? Vector2.zero : bestSpawn.position;
+        }
+
+        public void Sim_SetSpawnPoints(IReadOnlyList<Transform> points)
+            => SetSpawnPoints(points, true);
+
+        public void SetSpawnPoints(IReadOnlyList<Transform> points, bool resetSpawnIndex)
+        {
+            spawnPoints.Clear();
+
+            if (points != null)
+            {
+                for (int i = 0; i < points.Count; i++)
+                {
+                    if (points[i])
+                        spawnPoints.Add(points[i]);
+                }
+            }
+
+            if (resetSpawnIndex)
+                currentState.spawnPointIndex = 0;
+        }
+
+        public void Sim_RespawnAllPlayers()
+        {
+            for (int i = 0; i < currentState.values.Count; i++)
+            {
+                PredictedObjectID objectID = currentState.values[i].objectID;
+                if (hierarchy.TryGetComponent<PlayerReferences>(objectID, out var references))
+                    references.PlayerRespawner.Sim_Respawn(false);
+            }
         }
     }
 }

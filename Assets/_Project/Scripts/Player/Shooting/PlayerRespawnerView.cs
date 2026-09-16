@@ -12,14 +12,12 @@ namespace Game.Player
         [SerializeField] private GameObject _viewRoot;
 
         private PlayerHealth _health => _references.PlayerHealth;
-        private PlayerRespawner _respawner => _references.PlayerRespawner;
-
         private Coroutine _showViewRootCoroutine;
 
         private void Subscribe()
         {
             _health.Verified_Died += OnDied;
-            _respawner.Sim_Respawned += OnRespawned;
+            _health.Verified_Respawned += OnRespawned;
         }
 
         private void Start()
@@ -44,7 +42,7 @@ namespace Game.Player
         private void Unsubscribe()
         {
             _health.Verified_Died -= OnDied;
-            _respawner.Sim_Respawned -= OnRespawned;
+            _health.Verified_Respawned -= OnRespawned;
         }
 
         private void OnRespawned()

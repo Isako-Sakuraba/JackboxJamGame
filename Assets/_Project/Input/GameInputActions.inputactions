@@ -55,6 +55,26 @@
                     "interactions": "",
                     "initialStateCheck": true,
                     "priority": 0
+                },
+                {
+                    "name": "Scoreboard",
+                    "type": "Button",
+                    "id": "a3d74eb9-c725-4f05-b123-c6ecd3e93243",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false,
+                    "priority": 0
+                },
+                {
+                    "name": "CameraDelta",
+                    "type": "Value",
+                    "id": "b926e48f-65dc-45d3-a5a0-249cceee7473",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true,
+                    "priority": 0
                 }
             ],
             "bindings": [
@@ -148,6 +168,17 @@
                 },
                 {
                     "name": "",
+                    "id": "f31e7022-b398-4ba5-a22a-73764d3093e8",
+                    "path": "<Gamepad>/leftStickPress",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "b927f4bd-e3b8-4080-8708-97043b8a0c4b",
                     "path": "<Keyboard>/shift",
                     "interactions": "",
@@ -187,6 +218,39 @@
                     "processors": "",
                     "groups": "",
                     "action": "MousePosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "a1210e8a-c2de-478d-9cd7-477813d44e96",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "34149596-f784-4392-bc18-a1e348539c67",
+                    "path": "<Gamepad>/start",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scoreboard",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "72a58064-2712-42e2-98cb-b633df3c6cdf",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CameraDelta",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

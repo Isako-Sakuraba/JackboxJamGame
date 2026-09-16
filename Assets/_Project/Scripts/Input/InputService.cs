@@ -15,8 +15,10 @@ namespace Game.Core
         public ButtonState Jump => GetButtonState(_actions.Gameplay.Jump);
         public ButtonState Dash => GetButtonState(_actions.Gameplay.Dash);
         public ButtonState Shoot => GetButtonState(_actions.Gameplay.Shoot);
+        public ButtonState Scoreboard => GetButtonState(_actions.Gameplay.Scoreboard);
 
         public Vector2 MousePosition => GetValue<Vector2>(_actions.Gameplay.MousePosition);
+        public Vector2 CameraDelta => GetValue<Vector2>(_actions.Gameplay.CameraDelta);
 
         private void Awake()
         {

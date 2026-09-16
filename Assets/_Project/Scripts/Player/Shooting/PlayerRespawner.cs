@@ -19,6 +19,7 @@ namespace Game.Player
         [SerializeField] private float _respawnTime = 3f;
 
         private AdvancedPlayerSpawner _spawner;
+        private PlayerLifeManager _lifeManager;
 
         public event Action Sim_Respawned = delegate { };
         public event Action View_Respawned = delegate { };
@@ -33,10 +34,9 @@ namespace Game.Player
             base.LateAwake();
 
             _references.PlayerHealth.Sim_Died += Sim_OnDied;
-            _references.PlayerHealth.Sim_RoundDied += Sim_OnRoundDied;
-            _references.PlayerHealth.Sim_GlobalDied += Sim_OnGlobalDied;
 
             _spawner = ServiceLocator.Get<AdvancedPlayerSpawner>();
+            _lifeManager = ServiceLocator.Get<PlayerLifeManager>();
 
             Respawned = new PredictedEvent(predictionManager, this);
         }
@@ -44,12 +44,13 @@ namespace Game.Player
         protected override void Destroyed()
         {
             _references.PlayerHealth.Sim_Died -= Sim_OnDied;
-            _references.PlayerHealth.Sim_RoundDied -= Sim_OnRoundDied;
-            _references.PlayerHealth.Sim_GlobalDied -= Sim_OnGlobalDied;
         }
 
         protected override void Simulate(ref RespawnState state, float delta)
         {
+            if (_lifeManager.IsChangingMap || _lifeManager.IsRoundFinished)
+                return;
+
             if (state.RespawnTimer > 0f)
             {
                 state.RespawnTimer = Mathf.Max(0f, state.RespawnTimer - delta);
@@ -76,29 +77,24 @@ namespace Game.Player
 
         private void Sim_OnDied(PlayerID iD)
         {
-            currentState.RespawnTimer = _respawnTime;
-        }
-
-        private void Sim_OnRoundDied()
-        {
-            currentState.RespawnTimer = _respawnTime;
-        }
-
-        private void Sim_OnGlobalDied()
-        {
-
+            _lifeManager.Sim_RecordDeath();
+            currentState.RespawnTimer = _lifeManager.IsRoundFinished ? 0f : _respawnTime;
         }
 
         public void Sim_Respawn(bool fromDeath = true)
         {
+            currentState.RespawnTimer = 0f;
             Vector2 position = _spawner.GetSafestPosition();
             _references.PlayerHealth.Respawn();
             _references.PlayerCameraWeapon.Respawn();
             _references.SimplePlayerController.Respawn();
             _references.SimplePlayerController.Sim_SetPosition(position);
 
-            Sim_Respawned.Invoke();
-            Respawned.Invoke();
+            if (fromDeath)
+            {
+                Sim_Respawned.Invoke();
+                Respawned.Invoke();
+            }
         }
     }
 }

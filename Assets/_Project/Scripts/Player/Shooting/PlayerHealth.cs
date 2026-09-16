@@ -1,3 +1,4 @@
+using Game.Services;
 using PurrNet;
 using PurrNet.Prediction;
 using System;
@@ -11,30 +12,25 @@ namespace Game.Player
         {
             public float InvincibilityTimer;
             public float CurrentHealth;
-            public int CurrentLives;
 
             public bool IsInvincible => InvincibilityTimer > 0f;
             public bool IsDead => CurrentHealth <= 0f;
-            public bool IsFullyDead => IsDead && CurrentLives <= 0;
 
             public override string ToString()
             {
-                return $"CurrentHealth: {CurrentHealth} | Lives: {CurrentLives}";
+                return $"CurrentHealth: {CurrentHealth}";
             }
 
             public void Dispose() { }
         }
 
         [SerializeField] private float _maxHealth = 100f;
-        [SerializeField] private int _maxLives = 3;
         [SerializeField] private float _invincibilityTime = 2f;
 
         public event Action<PlayerID, float> Sim_Damaged = delegate { };
         public event Action<PlayerID> Sim_Died = delegate { };
         public event Action Verified_Died = delegate { };
-        public event Action Verified_FullyDied = delegate { };
         public event Action Verified_Respawned = delegate { };
-        public event Action Sim_FullyDied = delegate { };
 
         [NonSerialized] public PredictedEvent<float> Damaged;
         [NonSerialized] public PredictedEvent Died;
@@ -42,10 +38,15 @@ namespace Game.Player
         public float MaxHealth => _maxHealth;
         public float InvincibilityTime => _invincibilityTime;
         public bool IsDead => currentState.CurrentHealth <= 0;
-        public bool IsFullyDead => IsDead & currentState.CurrentLives <= 0;
 
         bool _wasVerifiedDead = false;
-        bool _wasVerifiedFullyDead = false;
+        private PlayerLifeManager _lifeManager;
+
+        public override void OnPreSetup()
+        {
+            base.OnPreSetup();
+            _lifeManager = ServiceLocator.Get<PlayerLifeManager>();
+        }
 
         protected override void LateAwake()
         {
@@ -59,7 +60,6 @@ namespace Game.Player
         {
             return new HealthState() { 
                 CurrentHealth = _maxHealth,
-                CurrentLives = _maxLives,
                 InvincibilityTimer = _invincibilityTime
             };
         }
@@ -74,7 +74,8 @@ namespace Game.Player
 
         public void Sim_Damage(PlayerID from, float damage)
         {
-            if (IsDead || currentState.IsInvincible) 
+            if (IsDead || currentState.IsInvincible ||
+                (_lifeManager && (_lifeManager.IsChangingMap || _lifeManager.IsRoundFinished)))
                 return;
 
             currentState.CurrentHealth -= damage;
@@ -85,7 +86,6 @@ namespace Game.Player
 
             if (IsDead)
             {
-                Sim_HandleJustDied();
                 Sim_Died.Invoke(from);
                 Died.Invoke();
             }
@@ -99,16 +99,6 @@ namespace Game.Player
             currentState.CurrentHealth += heal;
 
             currentState.CurrentHealth = Mathf.Min(_maxHealth, currentState.CurrentHealth);
-        }
-
-        private void Sim_HandleJustDied()
-        {
-            currentState.CurrentLives = Mathf.Max(0, currentState.CurrentLives - 1);
-
-            if (currentState.IsFullyDead)
-            {
-                Sim_FullyDied.Invoke();
-            }
         }
 
         protected override void UpdateView(HealthState viewState, HealthState? verified)
@@ -130,14 +120,6 @@ namespace Game.Player
             _wasVerifiedDead = isVerifiedDead;
 
 
-            bool isVerifiedFullyDead = verified.Value.IsFullyDead;
-
-            if (isVerifiedFullyDead && !_wasVerifiedFullyDead)
-            {
-                Verified_FullyDied.Invoke();
-            }
-
-            _wasVerifiedFullyDead = isVerifiedFullyDead;
         }
 
         protected override HealthState Interpolate(HealthState from, HealthState to, float t)

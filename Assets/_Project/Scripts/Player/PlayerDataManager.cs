@@ -29,6 +29,18 @@ namespace Game.Player
 
         public static IDictionary<PlayerID, PlayerData> Players => _instance._players;
 
+        public static bool TryGetPlayers(out IDictionary<PlayerID, PlayerData> players)
+        {
+            players = _instance ? _instance._players : null;
+            return players != null;
+        }
+
+        public static bool TryGetPlayerData(PlayerID player, out PlayerData data)
+        {
+            data = default;
+            return _instance && _instance._players.TryGetValue(player, out data);
+        }
+
         public static PlayerData LocalPlayerData
         {
             get
@@ -64,10 +76,7 @@ namespace Game.Player
             _instance = this;
 
             if (asServer)
-            {
-                networkManager.onPlayerLeft += OnPlayerLeft;
                 return;
-            }
 
             if (GameOrchestrator.active && GameOrchestrator.active.sessionProvider.isLoggedIn)
                 RegisterPlayer(GameOrchestrator.active.sessionProvider.playerName);
@@ -77,9 +86,6 @@ namespace Game.Player
 
         protected override void OnDespawned(bool asServer)
         {
-            if (asServer)
-                networkManager.onPlayerLeft -= OnPlayerLeft;
-
             if (!asServer && _instance == this)
                 _instance = null;
         }
@@ -92,12 +98,5 @@ namespace Game.Player
             _players[playerID] = new PlayerData(displayName,playerID);
         }
 
-        private void OnPlayerLeft(PlayerID playerID, bool asServer)
-        {
-            if (!asServer)
-                return;
-
-            _players.Remove(playerID);
-        }
     }
 }

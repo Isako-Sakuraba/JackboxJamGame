@@ -27,14 +27,16 @@ namespace Game.Player
 
         private void OnDisable()
         {
-            _health.Sim_Died += OnPlayerDied;
+            _health.Sim_Died -= OnPlayerDied;
         }
 
         private void OnPlayerDied(PlayerID id)
         {
-            _score.Sim_AddDeath(id);
             if (_health.owner.HasValue)
-                _score.Sim_AddKill(_health.owner.Value);
+                _score.Sim_AddDeath(_health.owner.Value);
+
+            if (!_health.owner.HasValue || !id.Equals(_health.owner.Value))
+                _score.Sim_AddKill(id);
         }
     }
 }

@@ -42,7 +42,9 @@ namespace Game.Core
         public ButtonState Jump { get; }
         public ButtonState Dash { get; }
         public ButtonState Shoot { get; }
+        public ButtonState Scoreboard { get; }
 
         public Vector2 MousePosition { get; }
+        public Vector2 CameraDelta { get; }
     }
 }

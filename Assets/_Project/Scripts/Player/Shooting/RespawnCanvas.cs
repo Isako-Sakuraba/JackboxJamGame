@@ -15,6 +15,7 @@ namespace Game.Player
 
         private PlayerHealth _health;
         private PlayerRespawner _respawner;
+        private PlayerLifeManager _lifeManager;
 
         private void Awake()
         {
@@ -43,10 +44,13 @@ namespace Game.Player
 
         private void Update()
         {
+            _lifeManager ??= ServiceLocator.TryGet<PlayerLifeManager>(out var manager) ? manager : null;
+            bool gameplayPaused = _lifeManager != null &&
+                (_lifeManager.ViewIsChangingMap || _lifeManager.ViewIsRoundFinished);
             bool isDead = _health != null && _health.viewState.IsDead;
-            SetVisible(isDead);
+            SetVisible(isDead && !gameplayPaused);
 
-            if (!isDead || _respawnText == null || _respawner == null)
+            if (!isDead || gameplayPaused || _respawnText == null || _respawner == null)
                 return;
 
             float respawnTimer = Mathf.Max(0f, _respawner.viewState.RespawnTimer);

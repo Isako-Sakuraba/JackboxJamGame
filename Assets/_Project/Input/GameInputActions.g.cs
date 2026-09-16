@@ -105,7 +105,7 @@ namespace Input.Generated
                     ""priority"": 0
                 },
                 {
-                    ""name"": ""JumpPressed"",
+                    ""name"": ""Jump"",
                     ""type"": ""Button"",
                     ""id"": ""ed35840b-b0af-4ddd-817b-197729294123"",
                     ""expectedControlType"": """",
@@ -138,6 +138,26 @@ namespace Input.Generated
                     ""name"": ""MousePosition"",
                     ""type"": ""Value"",
                     ""id"": ""a984382c-eb24-42f4-8dcc-8ca0ab3c53e3"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""Scoreboard"",
+                    ""type"": ""Button"",
+                    ""id"": ""a3d74eb9-c725-4f05-b123-c6ecd3e93243"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false,
+                    ""priority"": 0
+                },
+                {
+                    ""name"": ""CameraDelta"",
+                    ""type"": ""Value"",
+                    ""id"": ""b926e48f-65dc-45d3-a5a0-249cceee7473"",
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """",
@@ -219,7 +239,7 @@ namespace Input.Generated
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""JumpPressed"",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -230,7 +250,18 @@ namespace Input.Generated
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""JumpPressed"",
+                    ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f31e7022-b398-4ba5-a22a-73764d3093e8"",
+                    ""path"": ""<Gamepad>/leftStickPress"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -277,6 +308,39 @@ namespace Input.Generated
                     ""action"": ""MousePosition"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1210e8a-c2de-478d-9cd7-477813d44e96"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scoreboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""34149596-f784-4392-bc18-a1e348539c67"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Scoreboard"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""72a58064-2712-42e2-98cb-b633df3c6cdf"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraDelta"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -286,10 +350,12 @@ namespace Input.Generated
             // Gameplay
             m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
             m_Gameplay_Move = m_Gameplay.FindAction("Move", throwIfNotFound: true);
-            m_Gameplay_Jump = m_Gameplay.FindAction("JumpPressed", throwIfNotFound: true);
+            m_Gameplay_Jump = m_Gameplay.FindAction("Jump", throwIfNotFound: true);
             m_Gameplay_Dash = m_Gameplay.FindAction("Dash", throwIfNotFound: true);
             m_Gameplay_Shoot = m_Gameplay.FindAction("Shoot", throwIfNotFound: true);
             m_Gameplay_MousePosition = m_Gameplay.FindAction("MousePosition", throwIfNotFound: true);
+            m_Gameplay_Scoreboard = m_Gameplay.FindAction("Scoreboard", throwIfNotFound: true);
+            m_Gameplay_CameraDelta = m_Gameplay.FindAction("CameraDelta", throwIfNotFound: true);
         }
 
         ~@GameInputActions()
@@ -375,6 +441,8 @@ namespace Input.Generated
         private readonly InputAction m_Gameplay_Dash;
         private readonly InputAction m_Gameplay_Shoot;
         private readonly InputAction m_Gameplay_MousePosition;
+        private readonly InputAction m_Gameplay_Scoreboard;
+        private readonly InputAction m_Gameplay_CameraDelta;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -391,7 +459,7 @@ namespace Input.Generated
             /// </summary>
             public InputAction @Move => m_Wrapper.m_Gameplay_Move;
             /// <summary>
-            /// Provides access to the underlying input action "Gameplay/JumpPressed".
+            /// Provides access to the underlying input action "Gameplay/Jump".
             /// </summary>
             public InputAction @Jump => m_Wrapper.m_Gameplay_Jump;
             /// <summary>
@@ -406,6 +474,14 @@ namespace Input.Generated
             /// Provides access to the underlying input action "Gameplay/MousePosition".
             /// </summary>
             public InputAction @MousePosition => m_Wrapper.m_Gameplay_MousePosition;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Scoreboard".
+            /// </summary>
+            public InputAction @Scoreboard => m_Wrapper.m_Gameplay_Scoreboard;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/CameraDelta".
+            /// </summary>
+            public InputAction @CameraDelta => m_Wrapper.m_Gameplay_CameraDelta;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -447,6 +523,12 @@ namespace Input.Generated
                 @MousePosition.started += instance.OnMousePosition;
                 @MousePosition.performed += instance.OnMousePosition;
                 @MousePosition.canceled += instance.OnMousePosition;
+                @Scoreboard.started += instance.OnScoreboard;
+                @Scoreboard.performed += instance.OnScoreboard;
+                @Scoreboard.canceled += instance.OnScoreboard;
+                @CameraDelta.started += instance.OnCameraDelta;
+                @CameraDelta.performed += instance.OnCameraDelta;
+                @CameraDelta.canceled += instance.OnCameraDelta;
             }
 
             /// <summary>
@@ -473,6 +555,12 @@ namespace Input.Generated
                 @MousePosition.started -= instance.OnMousePosition;
                 @MousePosition.performed -= instance.OnMousePosition;
                 @MousePosition.canceled -= instance.OnMousePosition;
+                @Scoreboard.started -= instance.OnScoreboard;
+                @Scoreboard.performed -= instance.OnScoreboard;
+                @Scoreboard.canceled -= instance.OnScoreboard;
+                @CameraDelta.started -= instance.OnCameraDelta;
+                @CameraDelta.performed -= instance.OnCameraDelta;
+                @CameraDelta.canceled -= instance.OnCameraDelta;
             }
 
             /// <summary>
@@ -521,7 +609,7 @@ namespace Input.Generated
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMove(InputAction.CallbackContext context);
             /// <summary>
-            /// Method invoked when associated input action "JumpPressed" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// Method invoked when associated input action "Jump" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>
             /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
@@ -548,6 +636,20 @@ namespace Input.Generated
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnMousePosition(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Scoreboard" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnScoreboard(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "CameraDelta" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCameraDelta(InputAction.CallbackContext context);
         }
     }
 }

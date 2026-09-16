@@ -109,6 +109,8 @@ namespace Game.Player
         private readonly RaycastHit2D[] _hits = new RaycastHit2D[8];
 
         private IInputService _inputService;
+        private PlayerHealth _health;
+        private PlayerLifeManager _lifeManager;
         private ContactFilter2D _collisionFilter;
         private Vector2 _positionBeforePhysics;
 
@@ -119,6 +121,7 @@ namespace Game.Player
         private void Awake()
         {
             ResolveDependencies();
+            _health = GetComponentInParent<PlayerReferences>()?.PlayerHealth;
             RebuildCollisionFilter();
             ConfigureRigidbody();
         }
@@ -127,6 +130,7 @@ namespace Game.Player
         {
             base.OnPreSetup();
             _inputService = ServiceLocator.Get<IInputService>();
+            _lifeManager = ServiceLocator.Get<PlayerLifeManager>();
             ConfigureRigidbody();
         }
 
@@ -163,12 +167,24 @@ namespace Game.Player
 
         protected override void UpdateInput(ref PlayerInput input)
         {
+            if (IsGameplayLocked())
+            {
+                input = default;
+                return;
+            }
+
             input.JumpPressed |= _inputService.Jump.Pressed;
             input.JumpReleased |= _inputService.Jump.Released;
         }
 
         protected override void GetFinalInput(ref PlayerInput input)
         {
+            if (IsGameplayLocked())
+            {
+                input = default;
+                return;
+            }
+
             input.Move = _inputService.Move;
             input.JumpHeld = _inputService.Jump.Held;
         }
@@ -186,6 +202,12 @@ namespace Game.Player
 
         protected override void Simulate(PlayerInput input, ref PlayerState state, float delta)
         {
+            if (IsGameplayLocked())
+            {
+                StopMovement(ref state);
+                return;
+            }
+
             SyncCollisionState(ref state);
 
             state.TickTimers(delta);
@@ -209,6 +231,12 @@ namespace Game.Player
 
         protected override void LateSimulate(PlayerInput input, ref PlayerState state, float delta)
         {
+            if (IsGameplayLocked())
+            {
+                StopMovement(ref state);
+                return;
+            }
+
             if (_predictedBody != null)
             {
                 Vector2 afterMove = _predictedBody.position;
@@ -632,6 +660,9 @@ namespace Game.Player
             float directionalForce, 
             float verticalForce)
         {
+            if (IsGameplayLocked())
+                return;
+
             ////Debug.Log("Applied Knockback!");
             //_predictedBody.AddForce(direction * directionalForce, ForceMode2D.Impulse);
             //_predictedBody.AddForce(Vector2.up * Utils.GetJumpVelocity(verticalForce, AbsoluteGravity), ForceMode2D.Impulse);
@@ -644,6 +675,23 @@ namespace Game.Player
 
             // Set to current velocity if experiencing issues with knockback
             _predictedBody.velocity += knockback;
+        }
+
+        private bool IsGameplayLocked()
+        {
+            return (_health && _health.IsDead)
+                || (_lifeManager && (_lifeManager.IsChangingMap || _lifeManager.IsRoundFinished));
+        }
+
+        private void StopMovement(ref PlayerState state)
+        {
+            state.Velocity = Vector2.zero;
+
+            if (_predictedBody != null)
+                _predictedBody.velocity = Vector2.zero;
+
+            if (_rigidbody != null)
+                _rigidbody.linearVelocity = Vector2.zero;
         }
 
         public void Respawn()

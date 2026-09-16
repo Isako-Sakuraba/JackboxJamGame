@@ -23,6 +23,7 @@ namespace Game.Player
             public double? LagCompensationTick;
 
             public Vector2 ShootDirection;
+            public bool UsesGamepadAim;
 
             public void Dispose() { }
         }
@@ -86,6 +87,7 @@ namespace Game.Player
         [SerializeField] private float _directionalKnockbackForce = 6f;
         [SerializeField] private float _verticalKnockbackHeight = 2f;
         [SerializeField] private float _healOnKill = 36f;
+        [SerializeField, Range(0f, 1f)] private float _gamepadAimThreshold = 0.2f;
         [SerializeField] private Transform _shutterOrigin;
         [SerializeField] private LayerMask _hitLayer;
         [SerializeField] private LayerMask _obstacleLayer;
@@ -97,6 +99,8 @@ namespace Game.Player
         [SerializeField] private float _spotAngleMultiplier = 0.95f;
 
         private IInputService _inputService;
+        private PlayerLifeManager _lifeManager;
+        private bool _wasGamepadAiming;
 
         private Camera _camera;
 
@@ -119,6 +123,7 @@ namespace Game.Player
             base.OnPreSetup();
 
             _inputService = ServiceLocator.Get<IInputService>();
+            _lifeManager = ServiceLocator.Get<PlayerLifeManager>();
 
             RebuildHitFilter();
         }
@@ -137,13 +142,38 @@ namespace Game.Player
 
         protected override void UpdateInput(ref WeaponInput input)
         {
-            input.ShootPressed |= _inputService.Shoot.Pressed;
-
-            if (_inputService.Shoot.Released)
+            if (IsGameplayLocked())
             {
+                input = default;
+                return;
+            }
+
+            Vector2 cameraDelta = _inputService.CameraDelta;
+            bool gamepadAiming = cameraDelta.sqrMagnitude >= _gamepadAimThreshold * _gamepadAimThreshold;
+
+            if (gamepadAiming)
+            {
+                input.UsesGamepadAim = true;
+                input.ShootPressed |= !_wasGamepadAiming;
+            }
+            else if (_wasGamepadAiming)
+            {
+                input.UsesGamepadAim = true;
                 input.ShootReleased = true;
                 input.LagCompensationTick ??= lagCompensationTick;
             }
+            else
+            {
+                input.ShootPressed |= _inputService.Shoot.Pressed;
+
+                if (_inputService.Shoot.Released)
+                {
+                    input.ShootReleased = true;
+                    input.LagCompensationTick ??= lagCompensationTick;
+                }
+            }
+
+            _wasGamepadAiming = gamepadAiming;
         }
 
         protected override WeaponState GetInitialState()
@@ -153,6 +183,29 @@ namespace Game.Player
 
         protected override void GetFinalInput(ref WeaponInput input)
         {
+            if (IsGameplayLocked())
+            {
+                input = default;
+                return;
+            }
+
+            Vector2 cameraDelta = _inputService.CameraDelta;
+            bool gamepadAiming = cameraDelta.sqrMagnitude >= _gamepadAimThreshold * _gamepadAimThreshold;
+
+            if (gamepadAiming)
+            {
+                input.UsesGamepadAim = true;
+                input.ShootHeld = true;
+                input.ShootDirection = cameraDelta.normalized;
+                return;
+            }
+
+            if (input.UsesGamepadAim)
+            {
+                input.ShootHeld = false;
+                return;
+            }
+
             input.ShootHeld = _inputService.Shoot.Held;
 
             if (input.ShootReleased)
@@ -177,10 +230,17 @@ namespace Game.Player
             input.ShootPressed = false;
             input.ShootReleased = false;
             input.LagCompensationTick = null;
+            input.UsesGamepadAim = false;
         }
 
         protected override void Simulate(WeaponInput input, ref WeaponState state, float delta)
         {
+            if (IsGameplayLocked())
+            {
+                state = GetInitialState();
+                return;
+            }
+
             if (input.ShootPressed)
                 StartFocus(ref state);
 
@@ -189,7 +249,7 @@ namespace Game.Player
 
             UpdateFocusTimers(input, ref state, delta);
 
-            if (input.ShootHeld || input.ShootReleased)
+            if ((input.ShootHeld || input.ShootReleased) && input.ShootDirection.sqrMagnitude > 0.0001f)
                 UpdateDirection(input, ref state, delta);
 
             if (input.ShootReleased)
@@ -266,6 +326,9 @@ namespace Game.Player
             float radius,
             float angle)
         {
+            if (IsGameplayLocked())
+                return;
+
             if (!preciseTick.HasValue)
             {
                 return;
@@ -364,6 +427,12 @@ namespace Game.Player
         {
             currentState = GetInitialState();
             ResetInterpolation();
+        }
+
+        private bool IsGameplayLocked()
+        {
+            return _health.IsDead
+                || (_lifeManager && (_lifeManager.IsChangingMap || _lifeManager.IsRoundFinished));
         }
     }
 }

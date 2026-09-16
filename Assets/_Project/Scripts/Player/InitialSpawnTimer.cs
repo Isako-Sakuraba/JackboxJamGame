@@ -4,6 +4,7 @@ using PurrNet.Lobby;
 using PurrNet.Prediction;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace Game.Player
 {
@@ -13,7 +14,13 @@ namespace Game.Player
 
         [SerializeField] private int _expectedPlayerCountFallback = 2;
 
-        public UnityEvent SimAllJoined = new();
+        [FormerlySerializedAs("SimAllJoined")]
+        public UnityEvent Sim_AllJoinedAfterTimer = new();
+        public UnityEvent Sim_AllJoinedBeforeTimer = new();
+
+        public float ViewTime => viewState.Time;
+        public bool ViewFired => viewState.Fired;
+        public bool ViewCountdownActive => viewState.Time > 0f && !viewState.Fired;
 
         protected override TimerState GetInitialState()
         {
@@ -44,7 +51,10 @@ namespace Game.Player
             state.CurrentPlayers = predictionManager.players.players.Count;
 
             if (state.CurrentPlayers == state.ExpectedPlayers && state.Time <= 0f)
+            {
                 state.Time = _spawnTime;
+                Sim_AllJoinedBeforeTimer.Invoke();
+            }
 
             if (state.Time > 0f)
             {
@@ -52,7 +62,7 @@ namespace Game.Player
 
                 if (state.Time <= 0f)
                 {
-                    SimAllJoined.Invoke();
+                    Sim_AllJoinedAfterTimer.Invoke();
                     state.Fired = true;
                 }
             }
