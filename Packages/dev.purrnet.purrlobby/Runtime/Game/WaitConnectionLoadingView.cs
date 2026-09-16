@@ -9,11 +9,13 @@ namespace PurrNet.Lobby
         [SerializeField] private ViewStack _stack;
 
         private FullScreenLoadingView _loadingScreen;
+        private WaitingForPlayersView _waitingScreen;
 
         private void Awake()
         {
             if (!NetworkManager.isClientStatic)
             {
+                _waitingScreen = _stack.Push<WaitingForPlayersView>();
                 _loadingScreen = _stack.Push<FullScreenLoadingView>();
                 _loadingScreen.Setup("Connecting...");
             }
@@ -38,6 +40,11 @@ namespace PurrNet.Lobby
 
             if (conn == ConnectionState.Connected)
                 _stack.Pop(_loadingScreen);
+        }
+
+        public void OnAllPlayersLoaded()
+        {
+            _stack.Pop(_waitingScreen);
         }
     }
 }

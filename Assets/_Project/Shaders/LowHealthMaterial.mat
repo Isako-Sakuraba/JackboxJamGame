@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: PlayerBodyMaterial
-  m_Shader: {fileID: 4800000, guid: b67af4f685c91e14eb4aa0d495a877ac, type: 3}
+  m_Name: LowHealthMaterial
+  m_Shader: {fileID: 4800000, guid: 70ec9c93d50444c98f5d47ec0c2a4d2c, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -29,11 +29,17 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _ColorMask: 15
+    - _Radius: 0.896
     - _Softness: 1
-    - _Tolerance: 0.352
+    - _Stencil: 0
+    - _StencilComp: 8
+    - _StencilOp: 0
+    - _StencilReadMask: 255
+    - _StencilWriteMask: 255
+    - _UseUIAlphaClip: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _KeyColor: {r: 1, g: 0, b: 0, a: 1}
-    - _PlayerColor: {r: 1, g: 1, b: 1, a: 1}
+    - _VignetteColor: {r: 1, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
