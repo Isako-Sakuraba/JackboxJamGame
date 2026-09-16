@@ -24,6 +24,13 @@ namespace Game.Environment
         }
 #endif
 
+#if UNITY_EDITOR
+        private void Update()
+        {
+            ApplyPalette();
+        }
+#endif
+
         private void ApplyPalette()
         {
             if (_palette == null)

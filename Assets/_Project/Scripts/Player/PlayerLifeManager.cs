@@ -1,5 +1,6 @@
 using Game.Environment;
 using Game.Services;
+using PurrNet.Lobby;
 using PurrNet.Prediction;
 using UnityEngine;
 
@@ -21,6 +22,7 @@ namespace Game.Player
         }
 
         [SerializeField, Min(1)] private int _deathsPerMap = 5;
+        [SerializeField, Min(1)] private int _deathsPerMapPerPlayer = 3;
         [SerializeField, Min(0f)] private float _mapChangeDelay = 3f;
         [SerializeField, Min(0f)] private float _roundEndDelay = 5f;
         [SerializeField] private MapChanger _mapChanger;
@@ -41,10 +43,17 @@ namespace Game.Player
         public bool ViewIsChangingMap => viewState.IsChangingMap;
         public bool ViewIsRoundFinished => viewState.IsRoundFinished;
 
+        private int _calculatedDeathsPerMap = 2;
+
         public override void OnPreSetup()
         {
             base.OnPreSetup();
             ServiceLocator.Register(this);
+
+            if (GameOrchestrator.active != null && GameOrchestrator.active.activeLobby != null)
+                _calculatedDeathsPerMap = GameOrchestrator.active.activeLobby.players.Count;
+            else
+                _calculatedDeathsPerMap = _deathsPerMap;
         }
 
         protected override void LateAwake()
@@ -103,7 +112,7 @@ namespace Game.Player
                 return;
 
             currentState.DeathsThisMap++;
-            if (currentState.DeathsThisMap < _deathsPerMap)
+            if (currentState.DeathsThisMap < _calculatedDeathsPerMap)
                 return;
 
             if (currentState.CurrentMapIndex >= _mapChanger.MapCount - 1)

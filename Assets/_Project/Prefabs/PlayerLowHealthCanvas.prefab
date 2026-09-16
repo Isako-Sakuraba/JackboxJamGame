@@ -117,8 +117,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerLowHealthCanvas
   _vignetteImage: {fileID: 1000000000000000008}
-  _alphaRange: {x: 0, y: 0.8}
-  _healthThreshold: 30
+  _alphaRange: {x: 0, y: 0.92}
+  _healthThreshold: 40
   _lerpSpeed: 10
 --- !u!1 &1000000000000000006
 GameObject:

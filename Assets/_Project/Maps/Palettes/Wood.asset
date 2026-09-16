@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Wood
   m_EditorClassIdentifier: Assembly-CSharp::Game.Environment.MapPalette
   <BaseColor>k__BackingField: {r: 0.6862745, g: 0.5411765, b: 0.34901962, a: 1}
-  <SecondaryColor>k__BackingField: {r: 0.2784314, g: 0.16862746, b: 0.03529412, a: 1}
-  <BackgroundColor>k__BackingField: {r: 1, g: 1, b: 1, a: 1}
+  <SecondaryColor>k__BackingField: {r: 0.2603773, g: 0.21090084, b: 0.15082231, a: 1}
+  <BackgroundColor>k__BackingField: {r: 0.24528301, g: 0.24528301, b: 0.24528301, a: 1}
   <LinesColor>k__BackingField: {r: 0.87058824, g: 0.69411767, b: 0.5058824, a: 1}
   <BordersColor>k__BackingField: {r: 0.54901963, g: 0.42745098, b: 0.28235295, a: 1}
