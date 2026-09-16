@@ -3459,7 +3459,6 @@ GameObject:
   - component: {fileID: 8793236019712097653}
   - component: {fileID: 8535794285832675851}
   - component: {fileID: 4804161006362443128}
-  - component: {fileID: 7630827637817056874}
   m_Layer: 7
   m_Name: RigidbodyPlayer
   m_TagString: Untagged
@@ -3649,22 +3648,6 @@ MonoBehaviour:
   _colliders3D: []
   _colliders2D:
   - {fileID: 2433791428283974601}
---- !u!114 &7630827637817056874
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3117929452709367691}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f268d75d8cb559641b088550343fe022, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerKillAudio
-  _predictionPolicySource: 0
-  _predictionPolicy: 0
-  _audioSource: {fileID: 1757049365446817985}
-  _clip: {fileID: 8300000, guid: de82ea064d4e86a47b0bb819163781a7, type: 3}
 --- !u!1 &3330369254611422890
 GameObject:
   m_ObjectHideFlags: 0
@@ -3862,6 +3845,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 900e27152cfb25c4da193171100eff9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerCameraWeaponAnimator
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
   _controller: {fileID: 5775641456629789541}
   _weapon: {fileID: 983241538347168219}
   _target: {fileID: 7050672082265554949}
@@ -4116,6 +4101,7 @@ GameObject:
   - component: {fileID: 4258664894216824609}
   - component: {fileID: 6675878256814719100}
   - component: {fileID: 7554631227480799084}
+  - component: {fileID: 8388413046945302182}
   m_Layer: 7
   m_Name: Persistent
   m_TagString: Untagged
@@ -4275,8 +4261,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Game.Player.LocalRespawnIndicator
   _references: {fileID: 418217491203489074}
   _indicator: {fileID: 5576811093074468022}
-  _visibleDuration: 1.5
-  _rotationSmoothing: 12
+  _visibleDuration: 2
+  _rotationSmoothing: 20
   _rotationOffset: 180
 --- !u!114 &7554631227480799084
 MonoBehaviour:
@@ -4294,8 +4280,23 @@ MonoBehaviour:
   _predictionPolicy: 0
   _sources:
   - {fileID: 1757049365446817985}
-  - {fileID: 4952653892962420635}
   _nonOwnerVolume: 0.12
+--- !u!114 &8388413046945302182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5529753418656150497}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f268d75d8cb559641b088550343fe022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Game.Player.PlayerKillAudio
+  _predictionPolicySource: 0
+  _predictionPolicy: 0
+  _audioSource: {fileID: 1757049365446817985}
+  _clip: {fileID: 8300000, guid: de82ea064d4e86a47b0bb819163781a7, type: 3}
 --- !u!1 &5576811093074468022
 GameObject:
   m_ObjectHideFlags: 0

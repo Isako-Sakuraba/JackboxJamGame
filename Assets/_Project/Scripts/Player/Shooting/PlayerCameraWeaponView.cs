@@ -61,7 +61,19 @@ namespace Game.Player
         private void UpdateView(PlayerCameraWeapon.WeaponState viewState, PlayerCameraWeapon.WeaponState? verified)
         {
             if (viewState.State == PlayerCameraWeapon.FocusState.None)
+            {
+                if (!_shutterReleaseMotionHandle.IsActive())
+                {
+                    CancelLightFlash();
+                    _shutterLight.enabled = false;
+                }
+
                 return;
+            }
+
+            // Predicted events can be invalidated or missed during reconciliation.
+            // The replicated state remains the source of truth for visibility.
+            _shutterLight.enabled = true;
 
             float current = viewState.FocusTimer;
             float max = _weapon.FocusTime;

@@ -1556,6 +1556,18 @@ PrefabInstance:
       value: 0.11372549
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -1663,10 +1675,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7190740501594565979}
     m_Modifications:
+    - target: {fileID: 1481954308891553432, guid: b968de9f34a16e54e94710178af0821a, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1481954308891553432, guid: b968de9f34a16e54e94710178af0821a, type: 3}
+      propertyPath: _normalTone.blend
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1481954308891553432, guid: b968de9f34a16e54e94710178af0821a, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1481954308891553432, guid: b968de9f34a16e54e94710178af0821a, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2241820536637779163, guid: b968de9f34a16e54e94710178af0821a, type: 3}
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 8339868703278974620}
+    - target: {fileID: 2241820536637779163, guid: b968de9f34a16e54e94710178af0821a, type: 3}
+      propertyPath: _color.color
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 2761595020839450789, guid: b968de9f34a16e54e94710178af0821a, type: 3}
       propertyPath: m_Name
       value: Profile
@@ -2081,6 +2113,18 @@ PrefabInstance:
       value: 0.11372549
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2196,6 +2240,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6227380862327923504}
     - target: {fileID: 879444063519241705, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _normalOpacity
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 879444063519241705, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 879444063519241705, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
       value: 1
       objectReference: {fileID: 0}
@@ -2242,6 +2294,34 @@ PrefabInstance:
     - target: {fileID: 4537293246135247828, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
       propertyPath: m_Name
       value: Quit
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _roundnessRole
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _useMaxRoundness
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _uniformRoundness
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _roundnessInPixels.w
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _roundnessInPixels.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _roundnessInPixels.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 4646368662414912611, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
+      propertyPath: _roundnessInPixels.z
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 5150537323491684920, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2357,7 +2437,7 @@ PrefabInstance:
       objectReference: {fileID: 7957063008400127641}
     - target: {fileID: 8681256651719145930, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
       propertyPath: m_text
-      value: Quit
+      value: <icon=close> Quit
       objectReference: {fileID: 0}
     - target: {fileID: 8681256651719145930, guid: 2dbc7a2d62414a54192f2b42c14c0ca5, type: 3}
       propertyPath: m_fontAsset
@@ -2452,9 +2532,21 @@ PrefabInstance:
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 9124006590543279477}
+    - target: {fileID: 3693934584037749335, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _color.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.blend
       value: 0.000000049359304
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.color
@@ -2462,7 +2554,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -2892,6 +2984,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 735237208040574466}
     - target: {fileID: 5777953094713413276, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _coloredInfos.Array.data[0].color
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5777953094713413276, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _coloredInfos.Array.data[0].enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5777953094713413276, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
       propertyPath: _coloredInfos.Array.data[3].enabled
       value: 1
       objectReference: {fileID: 0}
@@ -2907,6 +3007,30 @@ PrefabInstance:
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 3617838676809128875}
+    - target: {fileID: 8275804794778027772, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _color.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8275804794778027772, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _color.contrast
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8743156949083178175, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8743156949083178175, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8743156949083178175, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _normalTone.shade.color
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8743156949083178175, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8743156949083178175, guid: 22dc86182baa3114d9fbf7e8b5c5b7a0, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -3017,9 +3141,21 @@ PrefabInstance:
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 959983093671471060}
+    - target: {fileID: 3693934584037749335, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _color.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.blend
       value: 0.000000049359304
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.color
@@ -3027,7 +3163,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -3280,9 +3416,21 @@ PrefabInstance:
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 74526135606057923}
+    - target: {fileID: 3693934584037749335, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _color.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.blend
-      value: 0.000000049359304
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.color
@@ -3290,7 +3438,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _normalTone.shade.enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4093494571155517460, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -3450,7 +3598,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8394812538829302174, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _shadowSize
-      value: 2.11
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8394812538829302174, guid: 6491b392ffebc374e935777cfd3f45a4, type: 3}
       propertyPath: _roundnessRole
@@ -3645,11 +3793,11 @@ PrefabInstance:
       objectReference: {fileID: 8148569957244094463}
     - target: {fileID: 3110532728764462410, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _color.color
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3110532728764462410, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _color.contrast
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3370907101242238404, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _graphicColor.b
@@ -3698,6 +3846,18 @@ PrefabInstance:
     - target: {fileID: 6457719766771539080, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _coloredInfos.Array.data[5].enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.color
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -3866,6 +4026,10 @@ PrefabInstance:
       propertyPath: _graphic
       value: 
       objectReference: {fileID: 8214783893969431903}
+    - target: {fileID: 3110532728764462410, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _color.color
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 3370907101242238404, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _graphicColor.b
       value: 0.9686275
@@ -3913,6 +4077,14 @@ PrefabInstance:
     - target: {fileID: 6457719766771539080, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _coloredInfos.Array.data[5].enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.color
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.color
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -4163,6 +4335,18 @@ PrefabInstance:
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _backgroundNormal.r
       value: 0.11372549
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size
@@ -4575,6 +4759,18 @@ PrefabInstance:
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: _backgroundNormal.r
       value: 0.11372549
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _hoverColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalColor.contrast
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
+      propertyPath: _normalTone.shade.enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6545535638871718880, guid: 5809fb624f51eea45b9c293ea3ff56ab, type: 3}
       propertyPath: onClickUnity.m_PersistentCalls.m_Calls.Array.size

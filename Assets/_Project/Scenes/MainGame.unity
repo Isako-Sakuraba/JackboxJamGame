@@ -505,7 +505,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: PurrNet.Runtime::PurrNet.StatisticsManager
   checkInterval: 0.33
   placement: 1
-  _displayType: 19
+  _displayType: 1
   _displayTarget: 6
   fontSize: 24
   textColor: {r: 0, g: 0, b: 0, a: 1}
@@ -4235,7 +4235,7 @@ MonoBehaviour:
   _predictionPolicySource: 0
   _predictionPolicy: 0
   _deathsPerMap: 2
-  _deathsPerMapPerPlayer: 3
+  _deathsPerMapPerPlayer: 5
   _mapChangeDelay: 5
   _roundEndDelay: 10
   _mapChanger: {fileID: 1037622097}
@@ -7700,6 +7700,10 @@ PrefabInstance:
     - target: {fileID: 1000000000000000001, guid: f17ff5d2c7de455987e8b5e18d8a01f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000000000000005, guid: f17ff5d2c7de455987e8b5e18d8a01f2, type: 3}
+      propertyPath: _alphaRange.y
+      value: 0.6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
