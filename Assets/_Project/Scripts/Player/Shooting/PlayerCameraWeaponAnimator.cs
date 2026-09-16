@@ -1,8 +1,9 @@
+using PurrNet.Prediction;
 using UnityEngine;
 
 namespace Game.Player
 {
-    public class PlayerCameraWeaponAnimator : MonoBehaviour
+    public class PlayerCameraWeaponAnimator : StatelessPredictedIdentity
     {
         [Header("Dependencies")]
         [SerializeField] private SimplePlayerController _controller;
@@ -54,15 +55,16 @@ namespace Game.Player
             _baseLocalRotationZ = _target.localEulerAngles.z;
         }
 
-        private void Update()
+        protected override void LateUpdateView()
         {
             if (_controller == null || _target == null)
                 return;
 
             SimplePlayerController.PlayerState state = _controller.viewState;
+            PlayerCameraWeapon.WeaponState weaponState = _weapon.viewState;
             GetTargetPose(state, out Vector3 targetPosition, out float targetRotationZ);
 
-            if (TryGetFocusPose(out Vector3 focusPosition, out float focusRotationZ))
+            if (TryGetFocusPose(weaponState, out Vector3 focusPosition, out float focusRotationZ))
             {
                 targetPosition = focusPosition;
                 targetRotationZ = focusRotationZ;
@@ -161,15 +163,16 @@ namespace Game.Player
             return Vector2.zero;
         }
 
-        private bool TryGetFocusPose(out Vector3 position, out float rotationZ)
+        private bool TryGetFocusPose(
+            PlayerCameraWeapon.WeaponState weaponState,
+            out Vector3 position,
+            out float rotationZ)
         {
             position = default;
             rotationZ = 0f;
 
             if (_weapon == null)
                 return false;
-
-            PlayerCameraWeapon.WeaponState weaponState = _weapon.viewState;
 
             if (weaponState.State == PlayerCameraWeapon.FocusState.None || weaponState.Direction == Vector2.zero)
                 return false;

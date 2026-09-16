@@ -3260,9 +3260,9 @@ ParticleSystemRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_GlobalIlluminationMeshLod: 0
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingLayerID: 2044499017
+  m_SortingLayer: 7
+  m_SortingOrder: 5
   m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -3440,7 +3440,7 @@ MonoBehaviour:
   _respawner: {fileID: 8535794285832675851}
   _audioSource: {fileID: 4952653892962420635}
   _clip: {fileID: 8300000, guid: 68d4ead31000fe54d96b1f22ea0a6ba1, type: 3}
-  _playChance: 1
+  _playChance: 0.2
 --- !u!1 &3117929452709367691
 GameObject:
   m_ObjectHideFlags: 0
@@ -4295,7 +4295,7 @@ MonoBehaviour:
   _sources:
   - {fileID: 1757049365446817985}
   - {fileID: 4952653892962420635}
-  _nonOwnerVolume: 0.2
+  _nonOwnerVolume: 0.12
 --- !u!1 &5576811093074468022
 GameObject:
   m_ObjectHideFlags: 0

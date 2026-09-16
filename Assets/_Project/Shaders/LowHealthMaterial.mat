@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _ColorMask: 15
-    - _Radius: 0.64
+    - _Radius: 1
     - _Softness: 1
     - _Stencil: 0
     - _StencilComp: 8
@@ -40,6 +40,6 @@ Material:
     - _UseUIAlphaClip: 0
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _VignetteColor: {r: 1, g: 0, b: 0, a: 1}
+    - _VignetteColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
