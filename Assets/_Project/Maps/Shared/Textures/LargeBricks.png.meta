@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 240da7c8e65d1b0459221753678e1e42
+guid: ed754804134f741408f4140dfc5ad55d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 8277821464062564047
-    second: Map1BG_0
+      213: -7241839567742302645
+    second: obstacleTiles_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,23 +37,23 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
-    wrapU: 1
-    wrapV: 1
-    wrapW: 1
+    wrapU: 2
+    wrapV: 2
+    wrapW: 2
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
-  spriteExtrude: 1
+  spriteMode: 1
+  spriteExtrude: 0
   spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 256
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
-  spriteGenerateFallbackPhysicsShape: 1
+  spriteGenerateFallbackPhysicsShape: 0
   alphaUsage: 1
   alphaIsTransparency: 1
   spriteTessellationMethod: 0
@@ -115,13 +115,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Map1BG_0
+      name: obstacleTiles_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1922
-        height: 1082
+        width: 256
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -130,8 +130,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fc69d8783cab0e270800000000000000
-      internalID: 8277821464062564047
+      spriteID: b460a543841df7b90800000000000000
+      internalID: -7241839567742302645
       vertices: []
       indices: 
       edges: []
@@ -140,7 +140,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -150,7 +150,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Map1BG_0: 8277821464062564047
+      obstacleTiles_0: -7241839567742302645
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

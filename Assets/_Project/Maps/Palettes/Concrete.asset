@@ -15,3 +15,5 @@ MonoBehaviour:
   <BaseColor>k__BackingField: {r: 0.5529412, g: 0.5568628, b: 0.57254905, a: 1}
   <SecondaryColor>k__BackingField: {r: 0.34509805, g: 0.34901962, b: 0.36862746, a: 1}
   <BackgroundColor>k__BackingField: {r: 0.20754719, g: 0.20754719, b: 0.20754719, a: 1}
+  <LinesColor>k__BackingField: {r: 1, g: 0.827451, b: 0.39215687, a: 1}
+  <BordersColor>k__BackingField: {r: 0.40784314, g: 0.4, b: 0.35686275, a: 1}

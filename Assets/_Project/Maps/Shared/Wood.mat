@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: NoiseMapMaterial
-  m_Shader: {fileID: 4800000, guid: 02c1ee58327846cf9f423f2cd4f9d677, type: 3}
+  m_Name: Wood
+  m_Shader: {fileID: 4800000, guid: 0ef45e0fec4f472686bbf0a6820025b9, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -23,23 +23,40 @@ Material:
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MaskTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TileTex:
+        m_Texture: {fileID: 2800000, guid: e6c7eeb2f461dc94fad7c3679e2af014, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _NoisePixelSize: 0.01
-    - _NoiseScale: 1.2
-    - _NoiseStrength: 0.424
+    - _Columns: 1
+    - _EnableExternalAlpha: 0
+    - _PixelsPerUnit: 64
+    - _Rows: 1
+    - _TileSize: 2.6
+    - _ZWrite: 0
     m_Colors:
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _GlobalNoiseOffset: {r: 0, g: 0, b: 0, a: 0}
-    - _NoiseOffset: {r: 0, g: 0, b: 0, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _SecondaryColor: {r: 0.4339623, g: 0.4339623, b: 0.4339623, a: 1}
     - _SpriteRendererColor: {r: 1, g: 1, b: 1, a: 1}
+    - _TileOffset: {r: 0.125, g: 0.75, b: 0, a: 0}
+    - _TileTextureSize: {r: 256, g: 256, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1

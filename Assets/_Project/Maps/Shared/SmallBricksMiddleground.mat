@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Obstacles
-  m_Shader: {fileID: 4800000, guid: 0ef45e0fec4f472686bbf0a6820025b9, type: 3}
+  m_Name: SmallBricksMiddleground
+  m_Shader: {fileID: 4800000, guid: 82e53c0db8e44ef39d77b69a46f0c01f, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -40,14 +40,14 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TileTex:
-        m_Texture: {fileID: 2800000, guid: ed754804134f741408f4140dfc5ad55d, type: 3}
+        m_Texture: {fileID: 2800000, guid: f694da325b38c154c8e43ca852606843, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _Columns: 4
+    - _Columns: 3
     - _EnableExternalAlpha: 0
-    - _PixelsPerUnit: 64
+    - _PixelsPerUnit: 128
     - _Rows: 1
     - _TileSize: 2.6
     - _ZWrite: 0
@@ -56,7 +56,7 @@ Material:
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
     - _SpriteRendererColor: {r: 1, g: 1, b: 1, a: 1}
-    - _TileOffset: {r: 0.125, g: 0.75, b: 0, a: 0}
-    - _TileTextureSize: {r: 256, g: 64, b: 0, a: 0}
+    - _TileOffset: {r: 0.38, g: -0.12, b: 0, a: 0}
+    - _TileTextureSize: {r: 768, g: 256, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
